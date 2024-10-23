@@ -1,4 +1,6 @@
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { cn } from "../utils/cn.ts";
 
 interface CursorProps {
 	defaultColor?: string;
@@ -34,7 +36,7 @@ export function Cursor({
 	}, [defaultColor]);
 
 	return (
-		<div className="fixed inset-0 pointer-events-none z-50">
+		<motion.div className="fixed inset-0 pointer-events-none z-50">
 			{/* Horizontal line */}
 			<div
 				className="absolute w-full"
@@ -57,7 +59,7 @@ export function Cursor({
 
 			{/* Hollow square cursor */}
 			<div
-				className="absolute"
+				className={"absolute"}
 				style={{
 					left: `${position.x - size / 2 + 12.5}px`,
 					top: `${position.y - size / 2 + 12.5}px`,
@@ -67,6 +69,6 @@ export function Cursor({
 					transform: "translate(-50%, -50%)",
 				}}
 			/>
-		</div>
+		</motion.div>
 	);
 }
