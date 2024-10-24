@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { cn } from "../utils/cn.ts";
 
 interface CursorProps {
 	defaultColor?: string;
@@ -36,7 +35,7 @@ export function Cursor({
 	}, [defaultColor]);
 
 	return (
-		<motion.div className="fixed inset-0 pointer-events-none z-50">
+		<motion.div className="fixed inset-0 pointer-events-none z-[9998]">
 			{/* Horizontal line */}
 			<div
 				className="absolute w-full"

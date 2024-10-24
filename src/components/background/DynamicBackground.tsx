@@ -1,117 +1,134 @@
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
-const DynamicBackground = () => {
-	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-	const [elements, setElements] = useState([]);
-	const [time, setTime] = useState(0);
+interface Sphere {
+	id: number;
+	size: number;
+	initialX: number;
+	initialY: number;
+	duration: number;
+	delay: number;
+	color: string;
+	scale: number; // For depth simulation
+	rotationSpeed: number;
+}
 
-	// Memoize element generation
-	const generateElements = useCallback(() => {
-		const numberOfElements = Math.floor(
-			(window.innerWidth * window.innerHeight) / 7000,
-		);
-		return Array.from({ length: numberOfElements }, (_, i) => ({
+interface DynamicBackgroundProps {
+	sphereCount?: number;
+	minSize?: number;
+	maxSize?: number;
+	minDuration?: number;
+	maxDuration?: number;
+	baseColor?: string;
+	minOpacity?: number;
+	maxOpacity?: number;
+}
+
+export const DynamicBackground = ({
+	sphereCount = 15,
+	minSize = 50,
+	maxSize = 200,
+	minDuration = 10,
+	maxDuration = 30,
+	baseColor = "255, 255, 255",
+	minOpacity = 0.05,
+	maxOpacity = 0.15,
+}: DynamicBackgroundProps) => {
+	const spheres = useMemo(() => {
+		return Array.from({ length: sphereCount }, (_, i) => ({
 			id: i,
-			x: Math.random() * window.innerWidth,
-			y: Math.random() * window.innerHeight,
-			width: Math.random() * 3 + 1,
-			height: Math.random() * 30 + 10,
-			baseOpacity: Math.random() * 0.3 + 0.1,
-			animationOffset: Math.random() * 2 * Math.PI,
-			animationSpeed: Math.random() * 0.3 + 0.5,
-			amplitude: Math.random() * 10 + 5,
+			size: Math.random() * (maxSize - minSize) + minSize,
+			initialX: Math.random() * 100,
+			initialY: Math.random() * 100,
+			duration: Math.random() * (maxDuration - minDuration) + minDuration,
+			delay: Math.random() * 2,
+			scale: Math.random() * 0.5 + 0.5, // Random scale for depth effect
+			rotationSpeed: Math.random() * 360, // Random rotation speed
+			color: `rgba(${baseColor}, ${
+				Math.random() * (maxOpacity - minOpacity) + minOpacity
+			})`,
 		}));
-	}, []);
+	}, [
+		sphereCount,
+		minSize,
+		maxSize,
+		minDuration,
+		maxDuration,
+		baseColor,
+		minOpacity,
+		maxOpacity,
+	]);
 
-	// Initialize elements
-	useEffect(() => {
-		return setElements(generateElements());
-	}, [generateElements]);
-
-	// Optimized mouse move handler with throttling
-	const handleMouseMove = useCallback((e) => {
-		requestAnimationFrame(() => {
-			setMousePosition({ x: e.clientX, y: e.clientY });
-		});
-	}, []);
-
-	// Optimized animation loop using requestAnimationFrame
-	useEffect(() => {
-		let frameId: number;
-		let lastTime = performance.now();
-
-		const animate = (currentTime: number) => {
-			const deltaTime = (currentTime - lastTime) / 1000;
-			lastTime = currentTime;
-
-			setTime((prevTime) => prevTime + deltaTime * 2);
-			frameId = requestAnimationFrame(animate);
-		};
-
-		frameId = requestAnimationFrame(animate);
-		return () => cancelAnimationFrame(frameId);
-	}, []);
-
-	// Memoize maxDistance calculation
-	const maxDistance = useMemo(() => 300, []);
+	const moveVariants = {
+		animate: (sphere: Sphere) => ({
+			x: [
+				sphere.initialX + "%",
+				sphere.initialX - 20 + "%",
+				sphere.initialX + 20 + "%",
+				sphere.initialX + "%",
+			],
+			y: [
+				sphere.initialY + "%",
+				sphere.initialY + 20 + "%",
+				sphere.initialY - 20 + "%",
+				sphere.initialY + "%",
+			],
+			scale: [
+				sphere.scale,
+				sphere.scale * 1.1,
+				sphere.scale * 0.9,
+				sphere.scale,
+			],
+			rotate: [0, sphere.rotationSpeed, sphere.rotationSpeed * 2, 360],
+			filter: [
+				"brightness(1)",
+				"brightness(1.1)",
+				"brightness(0.9)",
+				"brightness(1)",
+			],
+			transition: {
+				duration: sphere.duration,
+				repeat: Number.POSITIVE_INFINITY,
+				ease: "linear",
+				delay: sphere.delay,
+				times: [0, 0.33, 0.66, 1],
+			},
+		}),
+	};
 
 	return (
-		<motion.div
-			className="fixed inset-0 overflow-hidden bg-black pointer-events-none blur-sm"
-			onMouseMove={handleMouseMove}
-		>
-			{elements.map((element) => {
-				// Optimized calculations
-				const animY =
-					Math.sin(time * element.animationSpeed + element.animationOffset) *
-					element.amplitude;
-				const animX =
-					Math.cos(
-						time * element.animationSpeed * 0.5 + element.animationOffset,
-					) *
-					(element.amplitude * 0.5);
+		<div className="fixed inset-0 overflow-hidden bg-gradient-to-br from-blue-900 to-purple-900 perspective-1000 h-screen w-screen z-[-1]">
+			{spheres.map((sphere) => (
+				<motion.div
+					key={sphere.id}
+					custom={sphere}
+					variants={moveVariants}
+					animate="animate"
+					className="absolute rounded-full"
+					style={{
+						width: sphere.size,
+						height: sphere.size,
+						left: `${sphere.initialX}%`,
+						top: `${sphere.initialY}%`,
+						transform: "translate(-50%, -50%)",
+						background: `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), ${sphere.color})`,
+						boxShadow: `
+                            inset -10px -10px 20px rgba(0, 0, 0, 0.2),
+                            inset 5px 5px 15px rgba(255, 255, 255, 0.2),
+                            0 0 20px ${sphere.color}
+                        `,
+						zIndex: Math.floor(sphere.scale * 10),
+					}}
+				/>
+			))}
+			<div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-900/50" />
 
-				const deltaX = mousePosition.x - element.x;
-				const deltaY = mousePosition.y - element.y;
-				const distance = Math.hypot(deltaX, deltaY);
-
-				const influence = Math.max(0, 1 - distance / maxDistance);
-				const luminance = Math.min(1, element.baseOpacity + influence * 0.6);
-
-				const moveRange = 15;
-				const xOffset =
-					(deltaX / (distance || 1)) * influence * moveRange + animX;
-				const yOffset =
-					(deltaY / (distance || 1)) * influence * moveRange + animY;
-
-				// Use transform instead of x/y position for better performance
-				const transform = `translate3d(${element.x + xOffset}px, ${element.y + yOffset}px, 0)`;
-
-				return (
-					<motion.div
-						key={element.id}
-						className="absolute will-change-transform"
-						initial={{
-							width: element.width,
-							height: element.height,
-						}}
-						style={{
-							transform,
-							width: element.width,
-							height: element.height * (1 + influence * 0.3),
-							filter: influence > 0.1 ? `blur(${0.5 + influence}px)` : "none",
-							backgroundColor: `rgba(30, 100, 255, ${luminance})`,
-							boxShadow:
-								influence > 0.5
-									? `0 0 ${influence * 10}px rgba(30, 100, 255, ${influence * 0.3})`
-									: "none",
-						}}
-					/>
-				);
-			})}
-		</motion.div>
+			<div
+				className="absolute inset-0 mix-blend-overlay opacity-50"
+				style={{
+					backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+				}}
+			/>
+		</div>
 	);
 };
-
-export default DynamicBackground;
