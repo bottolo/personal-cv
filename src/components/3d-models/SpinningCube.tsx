@@ -1,10 +1,21 @@
 import { AsciiRenderer } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import type * as THREE from "three";
+import { useRef, useState } from "react";
+import * as THREE from "three";
 
-const SpinningCube = () => {
+const GEOMETRIES = [
+	{ type: "BoxGeometry", args: [3, 3, 3] },
+	{ type: "TorusGeometry", args: [1.5, 0.5, 16, 32] },
+	{ type: "TetrahedronGeometry", args: [2, 0] },
+	{ type: "OctahedronGeometry", args: [2, 0] },
+	{ type: "DodecahedronGeometry", args: [2, 0] },
+	{ type: "IcosahedronGeometry", args: [2, 0] },
+	{ type: "TorusKnotGeometry", args: [1.5, 0.5, 128, 16] },
+];
+
+const SpinningGeometry = () => {
 	const meshRef = useRef<THREE.Mesh>(null);
+	const [geometryIndex, setGeometryIndex] = useState(0);
 
 	useFrame((state, delta) => {
 		if (meshRef.current) {
@@ -14,9 +25,17 @@ const SpinningCube = () => {
 		}
 	});
 
+	const handleClick = () => {
+		setGeometryIndex((prev) => (prev + 1) % GEOMETRIES.length);
+	};
+
+	const currentGeometry = GEOMETRIES[geometryIndex];
+
 	return (
-		<mesh ref={meshRef} rotation={[0, Math.PI * 0.25, 0]}>
-			<boxGeometry args={[3, 3, 3]} />
+		<mesh ref={meshRef} rotation={[0, Math.PI * 0.25, 0]} onClick={handleClick}>
+			<primitive
+				object={new THREE[currentGeometry.type](...currentGeometry.args)}
+			/>
 			<meshStandardMaterial color="white" />
 		</mesh>
 	);
@@ -43,7 +62,7 @@ export const AsciiBox = () => {
 			/>
 			<pointLight position={[-10, -10, -10]} intensity={0.5} />
 
-			<SpinningCube />
+			<SpinningGeometry />
 
 			<AsciiRenderer
 				invert={false}

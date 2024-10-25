@@ -4,7 +4,7 @@ import type { Dialogue } from "./types/dialogue-types.ts";
 export const DIALOGUES: Record<string, Dialogue> = {
 	firstChoice: {
 		id: "firstChoice",
-		name: "what have you worked on?",
+		name: "/projects",
 		dialogue: [
 			"Welcome to our world! I'll be your guide.",
 			"Let me show you around...",
@@ -15,7 +15,7 @@ export const DIALOGUES: Record<string, Dialogue> = {
 	},
 	secondChoice: {
 		id: "secondChoice",
-		name: "tell me about yourself",
+		name: "/about",
 		dialogue: [
 			"There's something you need to know...",
 			"The ancient prophecy speaks of a chosen one.",
@@ -25,7 +25,7 @@ export const DIALOGUES: Record<string, Dialogue> = {
 	},
 	thirdChoice: {
 		id: "thirdChoice",
-		name: "how can i contact you?",
+		name: "/contacts",
 		dialogue: [
 			"i have no physical form, but i can be reached through the terminal",
 			"of course i'm joking",

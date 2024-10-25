@@ -70,7 +70,7 @@ export const HolographicAvatar = ({
 						<img
 							src={imageUrl}
 							alt="Avatar"
-							className="w-full h-full object-cover border border-white/10"
+							className="w-full h-full object-cover border border-white/10 opacity-60"
 						/>
 						<div
 							className="absolute inset-0"

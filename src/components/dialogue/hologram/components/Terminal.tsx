@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { useTerminalStore } from "../../../../store/terminal-store.ts";
@@ -14,15 +15,43 @@ const TypewriterText = ({
 			const timeout = setTimeout(() => {
 				setDisplayText((prev) => prev + text[currentIndex]);
 				setCurrentIndex((prev) => prev + 1);
-			}, 25); // Adjust speed here
+			}, 25);
 
 			return () => clearTimeout(timeout);
-		} else if (onComplete) {
+		}
+
+		if (onComplete) {
 			onComplete();
 		}
 	}, [currentIndex, text, onComplete]);
 
 	return <span>{displayText}</span>;
+};
+
+const floatingAnimation = {
+	animate: {
+		y: [0, -10, 0],
+		transition: {
+			duration: 5,
+			repeat: Number.POSITIVE_INFINITY,
+			ease: "easeInOut",
+		},
+	},
+};
+
+const glowingAnimation = {
+	animate: {
+		boxShadow: [
+			"0 0 20px 0px rgba(59, 130, 246, 0.2)",
+			"0 0 40px 0px rgba(59, 130, 246, 0.4)",
+			"0 0 20px 0px rgba(59, 130, 246, 0.2)",
+		],
+		transition: {
+			duration: 2,
+			repeat: Number.POSITIVE_INFINITY,
+			ease: "easeInOut",
+		},
+	},
 };
 
 const Terminal = () => {
@@ -177,33 +206,51 @@ const Terminal = () => {
 	};
 
 	return (
-		<div className="w-full max-w-2xl mx-auto bg-black text-green-500 p-4 rounded-lg shadow-lg">
-			<div ref={terminalRef} className="font-mono text-sm h-96 overflow-y-auto">
-				{lines.map((line, index) => (
-					<div key={index} className="py-1">
-						{index <= typingIndex ? (
-							<TypewriterText
-								text={line}
-								onComplete={
-									index === typingIndex ? handleLineComplete : undefined
-								}
-							/>
-						) : null}
-						{index === lines.length - 1 &&
-							isWaitingForInput &&
-							index <= typingIndex && (
-								<button
-									tabIndex={0}
-									type="button"
-									onClick={handleContinue}
-									onKeyDown={() => handleKeyDown}
-									className="w-full text-left text-gray-500 mt-2 hover:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 rounded px-2 animate-pulse"
-								>
-									[press enter or click to continue...]
-								</button>
-							)}
+		<div className="absolute top-[37rem] left-[13rem] -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl z-[30]">
+			<div className="relative">
+				{/* Glowing border */}
+				<motion.div
+					variants={glowingAnimation}
+					animate="animate"
+					className="absolute inset-[-1px] rounded-none border border-white/20 bg-white/10 backdrop-blur-lg -z-10 shadow-xl shadow-blue-500/20"
+					style={{
+						transform: "scale(1.02)",
+					}}
+				/>
+
+				{/* Terminal window */}
+				<div className="relative bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm text-blue-300 p-4 rounded-none shadow-lg border border-white/10">
+					<div
+						ref={terminalRef}
+						className="font-mono text-sm h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500/20 scrollbar-track-transparent"
+					>
+						{lines.map((line, index) => (
+							<div key={index} className="py-1">
+								{index <= typingIndex ? (
+									<TypewriterText
+										text={line}
+										onComplete={
+											index === typingIndex ? handleLineComplete : undefined
+										}
+									/>
+								) : null}
+								{index === lines.length - 1 &&
+									isWaitingForInput &&
+									index <= typingIndex && (
+										<button
+											tabIndex={0}
+											type="button"
+											onClick={handleContinue}
+											onKeyDown={() => handleKeyDown}
+											className="w-full text-left text-blue-400/60 mt-2 hover:text-blue-300/80 focus:outline-none focus:ring-1 focus:ring-blue-400/30 rounded px-2 animate-pulse transition-colors duration-200"
+										>
+											[press enter or click to continue...]
+										</button>
+									)}
+							</div>
+						))}
 					</div>
-				))}
+				</div>
 			</div>
 		</div>
 	);
