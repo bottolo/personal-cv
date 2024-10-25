@@ -55,7 +55,7 @@ const Terminal = () => {
 	const processBootSequence = (index = 0) => {
 		if (index < bootSequence.length) {
 			addLine(bootSequence[index]);
-			setTimeout(() => processBootSequence(index + 1), 1000); // Increased delay to account for typing
+			setTimeout(() => processBootSequence(index + 1), 1000);
 		} else {
 			finishBoot();
 			if (currentDialogue) {
@@ -93,9 +93,11 @@ const Terminal = () => {
 			addLine(shutdownSequence[index]);
 			setTimeout(() => processShutdownSequence(index + 1), 1000);
 		} else {
-			finishShutdown();
-			clearLines();
-			setCurrentDialogue(null);
+			setTimeout(() => {
+				finishShutdown();
+				clearLines();
+				setCurrentDialogue(null);
+			}, 2000);
 		}
 	};
 
