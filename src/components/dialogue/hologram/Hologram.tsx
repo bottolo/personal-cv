@@ -1,49 +1,78 @@
-import { motion } from "framer-motion";
-import { useDialogueStore } from "../../../store/dialogue-store.ts";
-import type { Dialogue } from "../../../types/dialogue-types.ts";
+import { AnimatePresence, motion } from "framer-motion";
+import { NoiseEffect } from "../../../utils/Noise.tsx";
+import { AsciiBox } from "../../3d-models/SpinningCube.tsx";
+import type { Dialogue } from "../types/dialogue-types.ts";
+import { HolographicAvatar } from "./components/Avatar.tsx";
+import Terminal from "./components/Terminal.tsx";
 
 interface DialogueHologramProps {
 	dialogue: Dialogue;
 	className?: string;
 }
 
-export const Hologram = ({
-	dialogue,
-	className = "",
-}: DialogueHologramProps) => {
-	const { currentPage, nextPage, previousPage } = useDialogueStore();
+const floatingAnimation = {
+	animate: {
+		x: [0, 8, 0],
+		y: [0, -8, 0],
+		transition: {
+			duration: Number.POSITIVE_INFINITY,
+			repeat: Number.POSITIVE_INFINITY,
+			ease: "easeInOut",
+		},
+	},
+};
 
+const glowingAnimation = {
+	animate: {
+		opacity: [0.7, 0.9, 0.7],
+		transition: {
+			duration: 2,
+			repeat: Number.POSITIVE_INFINITY,
+			ease: "easeInOut",
+		},
+	},
+};
+
+export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 	return (
-		<motion.div
-			initial={{ opacity: 0, scale: 0.8 }}
-			animate={{ opacity: 1, scale: 1 }}
-			exit={{ opacity: 0, scale: 0.8 }}
-			className={`bg-black/50 backdrop-blur-md p-6 rounded-lg ${className}`}
-		>
-			<div className="flex items-start gap-4">
-				<div className="w-16 h-16 bg-blue-500 rounded-full">
-					{/* Avatar component would go here */}
-				</div>
-
-				<div className="flex-1">
-					<h3 className="text-white text-xl font-bold mb-2">{dialogue.name}</h3>
-					<p className="text-white">{dialogue.dialogue[currentPage]}</p>
-				</div>
-			</div>
-
-			<div className="flex justify-between mt-4">
-				<button
-					type={"button"}
-					onClick={previousPage}
-					disabled={currentPage === 0}
-					className="text-white disabled:opacity-50"
+		<div className={`relative flex flex-col items-center ${className}`}>
+			<div className="w-[600px]">
+				{" "}
+				{/* Fixed width container */}
+				{/* Avatar Section */}
+				<motion.div
+					variants={floatingAnimation}
+					animate="animate"
+					className="relative z-20 flex items-center gap-8"
 				>
-					Previous
-				</button>
-				<button type={"button"} onClick={nextPage} className="text-white">
-					{currentPage === dialogue.dialogue.length - 1 ? "Close" : "Next"}
-				</button>
+					{/* Background with glow effect */}
+					<motion.div
+						variants={glowingAnimation}
+						animate="animate"
+						className="absolute inset-[-0.5rem] rounded-none border border-white/20 bg-white/10 backdrop-blur-lg -z-10 shadow-lg shadow-blue-500/20"
+						style={{
+							transform: "scale(1.1)",
+						}}
+					>
+						<NoiseEffect opacity={0.02} />
+					</motion.div>
+
+					{/* Avatar container with fixed width */}
+					<div className="w-[300px] flex-shrink-0">
+						<HolographicAvatar imageUrl={"/avatar-sopipet-0.png"} size={300} />
+					</div>
+
+					{/* Canvas container with fixed width */}
+					<div className="w-[310px] h-[200px] flex-shrink-0">
+						<AsciiBox />
+					</div>
+				</motion.div>
+				<div className="p-4">
+					<AnimatePresence>
+						<Terminal />
+					</AnimatePresence>
+				</div>
 			</div>
-		</motion.div>
+		</div>
 	);
 };

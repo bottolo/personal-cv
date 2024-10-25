@@ -1,4 +1,4 @@
-import type {Sphere} from "./sphere.ts";
+import type { Sphere } from "./sphere.ts";
 
 export const createMoveVariants = () => ({
 	animate: (sphere: Sphere) => ({

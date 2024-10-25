@@ -22,7 +22,7 @@ function App() {
 			{currentDialogue && (
 				<Hologram
 					dialogue={currentDialogue}
-					className="absolute top-14 left-14 transform -translate-x-1/2 -translate-y-1/2"
+					className="absolute top-[15rem] left-[450px] transform -translate-x-1/2 -translate-y-1/2"
 				/>
 			)}
 			<Cursor />

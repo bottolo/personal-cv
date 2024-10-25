@@ -2,7 +2,7 @@ import { Text } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
 import type * as THREE from "three";
-import type { StateConfig } from "../../../../types/dialogue-config-types.ts";
+import type { StateConfig } from "../../types/dialogue-config-types.ts";
 
 interface DialogueBoxProps {
 	text: string;
