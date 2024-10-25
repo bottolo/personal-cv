@@ -103,7 +103,7 @@ export const Choices = () => {
 	};
 
 	return (
-		<>
+		<div className="fixed h-screen w-full">
 			{Object.entries(DIALOGUES).map(([dialogueId, dialogue]) => {
 				const isActive = currentDialogue?.id === dialogueId;
 
@@ -129,6 +129,6 @@ export const Choices = () => {
 					</motion.div>
 				);
 			})}
-		</>
+		</div>
 	);
 };
