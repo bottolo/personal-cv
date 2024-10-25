@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
-import { useMemo } from "react";
-import { useDialogueStore } from "../../../store/dialogue-store.ts";
-import { DIALOGUES } from "../dialogues.ts";
-import { ChoiceCanvas } from "./components/ChoiceCanvas.tsx";
+import {motion} from "framer-motion";
+import {useMemo} from "react";
+import {useDialogueStore} from "../../../store/dialogue-store.ts";
+import {DIALOGUES} from "../dialogues.ts";
+import {ChoiceCanvas} from "./components/ChoiceCanvas.tsx";
 
 interface PositionConfig {
 	bottom: string;
@@ -14,18 +14,6 @@ interface PositionsConfig {
 	default: Record<string, PositionConfig>;
 	active: Record<string, Record<string, PositionConfig>>;
 }
-
-// interface ButtonLabels {
-// 	active: string;
-// 	inactive: string;
-// }
-
-// const getButtonLabels = (dialogue: Dialogue): ButtonLabels => {
-// 	return {
-// 		active: "Connecting...",
-// 		inactive: dialogue.name,
-// 	};
-// };
 
 export const Choices = () => {
 	const { currentDialogue } = useDialogueStore();
