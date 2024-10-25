@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { useTerminalStore } from "../../../../store/terminal-store.ts";
 
@@ -28,110 +28,122 @@ const Terminal = () => {
 
 	const { currentDialogue } = useDialogueStore();
 
-	// Handle boot sequence
-	useEffect(() => {
+	const processBootSequence = (index = 0) => {
+		if (index < bootSequence.length) {
+			addLine(bootSequence[index]);
+			setTimeout(() => processBootSequence(index + 1), 500);
+		} else {
+			finishBoot();
+			if (currentDialogue) {
+				addLine(currentDialogue.dialogue[0]);
+				setWaitingForInput(true);
+			}
+		}
+	};
+
+	const processDialogueChange = (index = 0) => {
+		const changeSequence = [
+			"Changing communication...",
+			"...",
+			"...",
+			"Reconnecting...",
+			"...",
+			"...",
+			"Connected.",
+		];
+
+		if (index < changeSequence.length) {
+			addLine(changeSequence[index]);
+			setTimeout(() => processDialogueChange(index + 1), 500);
+		} else {
+			finishDialogueChange();
+			if (currentDialogue) {
+				addLine(currentDialogue.dialogue[0]);
+				setWaitingForInput(true);
+			}
+		}
+	};
+
+	const processShutdownSequence = (index = 0) => {
+		if (index < shutdownSequence.length) {
+			addLine(shutdownSequence[index]);
+			setTimeout(() => processShutdownSequence(index + 1), 500);
+		} else {
+			finishShutdown();
+			clearLines();
+		}
+	};
+
+	// Handle initial boot and dialogue changes
+	useMemo(() => {
+		if (!currentDialogue) return false;
+
+		// Handle initial boot
 		if (
-			currentDialogue &&
 			!isBooting &&
 			!isShuttingDown &&
-			!isChangingDialogue
+			!isChangingDialogue &&
+			lines.length === 0
 		) {
 			startBoot();
-			let currentIndex = 0;
-
-			const bootInterval = setInterval(() => {
-				if (currentIndex < bootSequence.length) {
-					addLine(bootSequence[currentIndex]);
-					currentIndex++;
-				} else {
-					clearInterval(bootInterval);
-					finishBoot();
-					addLine(currentDialogue.dialogue[0]);
-					setWaitingForInput(true);
-				}
-			}, 500);
-
-			return () => clearInterval(bootInterval);
+			processBootSequence();
+			return true;
 		}
-	}, [currentDialogue]);
 
-	// Handle dialogue change
-	useEffect(() => {
-		if (currentDialogue && !isBooting && !isShuttingDown && lines.length > 0) {
+		// Handle dialogue changes only when dialogue content changes
+		const isNewDialogue =
+			lines.length > 0 &&
+			!isBooting &&
+			!isShuttingDown &&
+			!isChangingDialogue &&
+			currentDialogue.dialogue[0] !== lines[lines.length - 1];
+
+		if (isNewDialogue) {
 			startDialogueChange();
 			clearLines();
-			let currentIndex = 0;
-
-			const changeSequence = [
-				"Changing communication...",
-				"...",
-				"...",
-				"Reconnecting...",
-				"...",
-				"...",
-				"Connected.",
-			];
-
-			const changeInterval = setInterval(() => {
-				if (currentIndex < changeSequence.length) {
-					addLine(changeSequence[currentIndex]);
-					currentIndex++;
-				} else {
-					clearInterval(changeInterval);
-					finishDialogueChange();
-					addLine(currentDialogue.dialogue[0]);
-					setWaitingForInput(true);
-				}
-			}, 500);
-
-			return () => clearInterval(changeInterval);
+			processDialogueChange();
+			return true;
 		}
-	}, [currentDialogue?.dialogue]);
 
-	// Handle keyboard input
-	useEffect(() => {
-		const handleKeyPress = (e: KeyboardEvent) => {
-			if (e.key === "Enter" && isWaitingForInput && isAcceptingInput) {
-				if (
-					currentDialogue &&
-					currentLine < currentDialogue.dialogue.length - 1
-				) {
-					nextLine();
-					addLine(currentDialogue.dialogue[currentLine + 1]);
-				} else if (
-					currentDialogue &&
-					currentLine === currentDialogue.dialogue.length - 1
-				) {
-					startShutdown();
-					let currentIndex = 0;
+		return false;
+	}, [
+		currentDialogue?.dialogue[0],
+		isBooting,
+		isShuttingDown,
+		isChangingDialogue,
+	]);
 
-					const shutdownInterval = setInterval(() => {
-						if (currentIndex < shutdownSequence.length) {
-							addLine(shutdownSequence[currentIndex]);
-							currentIndex++;
-						} else {
-							clearInterval(shutdownInterval);
-							finishShutdown();
-							clearLines();
-						}
-					}, 500);
-				}
-			}
-		};
-
-		window.addEventListener("keypress", handleKeyPress);
-		return () => window.removeEventListener("keypress", handleKeyPress);
-	}, [currentLine, currentDialogue, isWaitingForInput]);
-
-	// Auto-scroll effect
-	useEffect(() => {
+	// Handle scrolling
+	useMemo(() => {
 		if (terminalRef.current) {
 			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
 		}
+		return terminalRef.current?.scrollHeight;
 	}, [lines]);
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (e.key === "Enter" && isWaitingForInput && isAcceptingInput) {
+			if (
+				currentDialogue &&
+				currentLine < currentDialogue.dialogue.length - 1
+			) {
+				nextLine();
+				addLine(currentDialogue.dialogue[currentLine + 1]);
+			} else if (
+				currentDialogue &&
+				currentLine === currentDialogue.dialogue.length - 1
+			) {
+				startShutdown();
+				processShutdownSequence();
+			}
+		}
+	};
+
 	return (
-		<div className="w-full max-w-2xl mx-auto bg-black text-green-500 p-4 rounded-lg shadow-lg">
+		<div
+			className="w-full max-w-2xl mx-auto bg-black text-green-500 p-4 rounded-lg shadow-lg"
+			onKeyDown={handleKeyDown}
+		>
 			<div ref={terminalRef} className="font-mono text-sm h-96 overflow-y-auto">
 				{lines.map((line, index) => (
 					<div key={index} className="py-1">
