@@ -66,7 +66,6 @@ export const ChoiceButton = ({
 		const targetRotX = -mousePosition[1] / (active ? 7 : 5);
 		const targetRotY = mousePosition[0] / (active ? 7 : 5);
 
-		// Reset rotation when not hovered and not active
 		const shouldResetRotation = !isHovered && !active;
 		const finalTargetRotX = shouldResetRotation ? 0 : targetRotX;
 		const finalTargetRotY = shouldResetRotation ? 0 : targetRotY;
@@ -76,7 +75,6 @@ export const ChoiceButton = ({
 		groupRef.current.rotation.y +=
 			(finalTargetRotY - groupRef.current.rotation.y) * 0.1;
 
-		// Determine target scale based on hover and active state
 		const targetScale = isHovered
 			? [
 					currentConfig.box.scale[0] * 1.03,
@@ -85,12 +83,10 @@ export const ChoiceButton = ({
 				]
 			: currentConfig.box.scale;
 
-		// Smoothly transition scale
 		meshRef.current.scale.x += (targetScale[0] - meshRef.current.scale.x) * 0.1;
 		meshRef.current.scale.y += (targetScale[1] - meshRef.current.scale.y) * 0.1;
 		meshRef.current.scale.z += (targetScale[2] - meshRef.current.scale.z) * 0.1;
 
-		// Smoothly transition position with faster return
 		const positionLerpFactor = !isHovered && !active ? 0.15 : 0.1;
 		meshRef.current.position.x +=
 			(currentConfig.box.position[0] - meshRef.current.position.x) *
@@ -102,7 +98,6 @@ export const ChoiceButton = ({
 			(currentConfig.box.position[2] - meshRef.current.position.z) *
 			positionLerpFactor;
 
-		// Smoothly transition rotation with faster return
 		const rotationLerpFactor = !isHovered && !active ? 0.15 : 0.1;
 		meshRef.current.rotation.x +=
 			(currentConfig.box.rotation[0] - meshRef.current.rotation.x) *
@@ -198,9 +193,11 @@ export const ChoiceButton = ({
 				<group ref={textRef}>
 					<Text
 						fontSize={currentConfig.text.fontSize}
-						color="white"
+						color="blue"
 						anchorX="center"
 						anchorY="middle"
+						font="src/fonts/Space_Mono/SpaceMono-Regular.ttf"
+						castShadow={true}
 					>
 						{text}
 					</Text>

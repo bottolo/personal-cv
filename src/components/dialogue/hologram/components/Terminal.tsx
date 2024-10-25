@@ -242,7 +242,7 @@ const Terminal = () => {
 											type="button"
 											onClick={handleContinue}
 											onKeyDown={() => handleKeyDown}
-											className="w-full text-left text-blue-400/60 mt-2 hover:text-blue-300/80 focus:outline-none focus:ring-1 focus:ring-blue-400/30 rounded px-2 animate-pulse transition-colors duration-200"
+											className="cursor-none w-full text-left text-blue-400/60 mt-2 hover:text-blue-300/80 focus:outline-none focus:ring-1 focus:ring-blue-400/30 rounded-none px-2 animate-pulse transition-colors duration-200"
 										>
 											[press enter or click to continue...]
 										</button>

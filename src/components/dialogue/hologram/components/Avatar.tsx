@@ -86,7 +86,7 @@ export const HolographicAvatar = ({
 				<Scanlines />
 
 				<div
-					className="absolute inset-0 rounded-lg"
+					className="absolute inset-0 rounded-none"
 					style={{
 						background: `radial-gradient(circle at 50% 50%, rgba(${glowColor}, 0.15), transparent 70%)`,
 						mixBlendMode: "screen",
@@ -94,7 +94,7 @@ export const HolographicAvatar = ({
 				/>
 
 				<motion.div
-					className="absolute inset-0 rounded-lg mix-blend-overlay"
+					className="absolute inset-0 rounded-none mix-blend-overlay"
 					animate={{
 						opacity: [0.97, 1, 0.98, 0.97],
 					}}
