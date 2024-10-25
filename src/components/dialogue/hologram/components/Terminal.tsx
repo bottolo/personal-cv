@@ -26,7 +26,7 @@ const Terminal = () => {
 		setWaitingForInput,
 	} = useTerminalStore();
 
-	const { currentDialogue } = useDialogueStore();
+	const { currentDialogue, setCurrentDialogue } = useDialogueStore();
 
 	const processBootSequence = (index = 0) => {
 		if (index < bootSequence.length) {
@@ -71,14 +71,13 @@ const Terminal = () => {
 		} else {
 			finishShutdown();
 			clearLines();
+			setCurrentDialogue(null);
 		}
 	};
 
-	// Handle initial boot and dialogue changes
 	useMemo(() => {
 		if (!currentDialogue) return false;
 
-		// Handle initial boot
 		if (
 			!isBooting &&
 			!isShuttingDown &&
@@ -90,7 +89,6 @@ const Terminal = () => {
 			return true;
 		}
 
-		// Handle dialogue changes only when dialogue content changes
 		const isNewDialogue =
 			lines.length > 0 &&
 			!isBooting &&
@@ -113,7 +111,6 @@ const Terminal = () => {
 		isChangingDialogue,
 	]);
 
-	// Handle scrolling
 	useMemo(() => {
 		if (terminalRef.current) {
 			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -121,8 +118,8 @@ const Terminal = () => {
 		return terminalRef.current?.scrollHeight;
 	}, [lines]);
 
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-		if (e.key === "Enter" && isWaitingForInput && isAcceptingInput) {
+	const handleContinue = () => {
+		if (isWaitingForInput && isAcceptingInput) {
 			if (
 				currentDialogue &&
 				currentLine < currentDialogue.dialogue.length - 1
@@ -139,19 +136,29 @@ const Terminal = () => {
 		}
 	};
 
+	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleContinue();
+		}
+	};
+
 	return (
-		<div
-			className="w-full max-w-2xl mx-auto bg-black text-green-500 p-4 rounded-lg shadow-lg"
-			onKeyDown={handleKeyDown}
-		>
+		<div className="w-full max-w-2xl mx-auto bg-black text-green-500 p-4 rounded-lg shadow-lg">
 			<div ref={terminalRef} className="font-mono text-sm h-96 overflow-y-auto">
 				{lines.map((line, index) => (
 					<div key={index} className="py-1">
 						{line}
 						{index === lines.length - 1 && isWaitingForInput && (
-							<div className="text-gray-500 mt-2">
-								[press enter to continue...]
-							</div>
+							<button
+								tabIndex={0}
+								type={"button"}
+								onClick={handleContinue}
+								onKeyDown={() => handleKeyDown}
+								className="w-full text-left text-gray-500 mt-2 hover:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 rounded px-2 animate-pulse"
+							>
+								[press enter or click to continue...]
+							</button>
 						)}
 					</div>
 				))}

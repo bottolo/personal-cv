@@ -7,7 +7,7 @@ interface TerminalState {
 	isShuttingDown: boolean;
 	isChangingDialogue: boolean;
 	isWaitingForInput: boolean;
-	isAcceptingInput: boolean; // New state to track when input should be accepted
+	isAcceptingInput: boolean;
 	bootSequence: string[];
 	shutdownSequence: string[];
 	setBootSequence: (sequence: string[]) => void;
@@ -22,7 +22,7 @@ interface TerminalState {
 	startDialogueChange: () => void;
 	finishDialogueChange: () => void;
 	setWaitingForInput: (waiting: boolean) => void;
-	setAcceptingInput: (accepting: boolean) => void; // New action
+	setAcceptingInput: (accepting: boolean) => void;
 }
 
 export const useTerminalStore = create<TerminalState>((set) => ({
@@ -32,7 +32,7 @@ export const useTerminalStore = create<TerminalState>((set) => ({
 	isShuttingDown: false,
 	isChangingDialogue: false,
 	isWaitingForInput: false,
-	isAcceptingInput: true, // Default to true
+	isAcceptingInput: true,
 	bootSequence: [
 		"Initiating communication...",
 		"...",
@@ -49,7 +49,7 @@ export const useTerminalStore = create<TerminalState>((set) => ({
 		"Disconnecting...",
 		"...",
 		"...",
-		"Disconnected.",
+		"Disconnected. Shutting down.",
 	],
 	setBootSequence: (sequence) => set({ bootSequence: sequence }),
 	setShutdownSequence: (sequence) => set({ shutdownSequence: sequence }),
@@ -59,36 +59,36 @@ export const useTerminalStore = create<TerminalState>((set) => ({
 	startBoot: () =>
 		set({
 			isBooting: true,
-			isAcceptingInput: false, // Disable input during boot
+			isAcceptingInput: false,
 			isWaitingForInput: false,
 		}),
 	finishBoot: () =>
 		set({
 			isBooting: false,
-			isAcceptingInput: true, // Re-enable input after boot
+			isAcceptingInput: true,
 		}),
 	startShutdown: () =>
 		set({
 			isShuttingDown: true,
-			isAcceptingInput: false, // Disable input during shutdown
+			isAcceptingInput: false,
 			isWaitingForInput: false,
 		}),
 	finishShutdown: () =>
 		set({
 			isShuttingDown: false,
-			isAcceptingInput: true, // Re-enable input after shutdown
+			isAcceptingInput: true,
 			currentLine: 0,
 		}),
 	startDialogueChange: () =>
 		set({
 			isChangingDialogue: true,
-			isAcceptingInput: false, // Disable input during dialogue change
+			isAcceptingInput: false,
 			isWaitingForInput: false,
 		}),
 	finishDialogueChange: () =>
 		set({
 			isChangingDialogue: false,
-			isAcceptingInput: true, // Re-enable input after dialogue change
+			isAcceptingInput: true,
 		}),
 	setWaitingForInput: (waiting) => set({ isWaitingForInput: waiting }),
 	setAcceptingInput: (accepting) => set({ isAcceptingInput: accepting }),
