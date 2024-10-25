@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
-import { useMemo } from "react";
-import { useDialogueStore } from "../../store/dialogue-store.ts";
-import { DialogueChoice } from "./DialogueChoice";
-import { DIALOGUES } from "./dialogues.ts";
+import {motion} from "framer-motion";
+import {useMemo} from "react";
+import {useDialogueStore} from "../../../store/dialogue-store.ts";
+import {DIALOGUES} from "../dialogues.ts";
+import {ChoiceCanvas} from "./components/ChoiceCanvas.tsx";
 
 interface PositionConfig {
 	bottom: string;
@@ -27,7 +27,7 @@ interface PositionsConfig {
 // 	};
 // };
 
-export const DialogueChoices = () => {
+export const Choices = () => {
 	const { currentDialogue } = useDialogueStore();
 
 	const positions = useMemo(
@@ -132,7 +132,7 @@ export const DialogueChoices = () => {
 							mass: 0.5,
 						}}
 					>
-						<DialogueChoice
+						<ChoiceCanvas
 							text={dialogue.name}
 							active={isActive}
 							dialogueId={dialogueId}

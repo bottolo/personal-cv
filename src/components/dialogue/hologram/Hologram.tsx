@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
-import { useDialogueStore } from "../../store/dialogue-store.ts";
-import type { Dialogue } from "../../types/dialogue-types.ts";
+import { useDialogueStore } from "../../../store/dialogue-store.ts";
+import type { Dialogue } from "../../../types/dialogue-types.ts";
 
 interface DialogueHologramProps {
 	dialogue: Dialogue;
 	className?: string;
 }
 
-export const DialogueHologram = ({
+export const Hologram = ({
 	dialogue,
 	className = "",
 }: DialogueHologramProps) => {

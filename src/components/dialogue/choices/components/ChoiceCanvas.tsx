@@ -10,9 +10,9 @@ import { motion as motion2d } from "framer-motion";
 import { BlendFunction } from "postprocessing";
 import { useRef } from "react";
 import * as THREE from "three";
-import { useDialogueStore } from "../../store/dialogue-store.ts";
-import { cn } from "../../utils/cn.ts";
-import { DialogueBox } from "./DialogueBox";
+import { useDialogueStore } from "../../../../store/dialogue-store.ts";
+import { cn } from "../../../../utils/cn.ts";
+import { ChoiceButton } from "./ChoiceButton.tsx";
 
 interface DialogueChoiceProps {
 	text?: string;
@@ -36,7 +36,7 @@ const ChromaticAberrationEffect = () => {
 	return <ChromaticAberration offset={offsetRef.current} />;
 };
 
-export const DialogueChoice = ({
+export const ChoiceCanvas = ({
 	text = "Example dialogue!",
 	color = "#ff3791",
 	confirmedColor = "#ff7d37",
@@ -73,7 +73,7 @@ export const DialogueChoice = ({
 					<ChromaticAberrationEffect />
 					<Grid scale={2} />
 				</EffectComposer>
-				<DialogueBox
+				<ChoiceButton
 					text={text}
 					color={color}
 					confirmedColor={confirmedColor}

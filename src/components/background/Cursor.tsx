@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {motion} from "framer-motion";
+import {useEffect, useState} from "react";
 
 interface CursorProps {
 	defaultColor?: string;
@@ -9,9 +9,9 @@ interface CursorProps {
 }
 export function Cursor({
 	defaultColor = "white",
-	size = 24,
+	size = 40,
 	thickness = 2,
-	lineThickness = 1,
+	lineThickness = 1.5,
 }: CursorProps) {
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const [currentColor, setCurrentColor] = useState(defaultColor);
@@ -60,8 +60,8 @@ export function Cursor({
 			<div
 				className={"absolute"}
 				style={{
-					left: `${position.x - size / 2 + 12.5}px`,
-					top: `${position.y - size / 2 + 12.5}px`,
+					left: `${position.x - size / 2 + 20.5}px`,
+					top: `${position.y - size / 2 + 20.5}px`,
 					width: `${size}px`,
 					height: `${size}px`,
 					border: `${thickness}px solid ${currentColor}`,

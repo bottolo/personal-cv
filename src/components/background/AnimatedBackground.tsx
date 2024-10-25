@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useMemo } from "react";
+import {motion} from "framer-motion";
+import {useMemo} from "react";
 
 interface Sphere {
 	id: number;
@@ -9,7 +9,7 @@ interface Sphere {
 	duration: number;
 	delay: number;
 	color: string;
-	scale: number; // For depth simulation
+	scale: number;
 	rotationSpeed: number;
 }
 
@@ -24,7 +24,7 @@ interface DynamicBackgroundProps {
 	maxOpacity?: number;
 }
 
-export const DynamicBackground = ({
+export const AnimatedBackground = ({
 	sphereCount = 15,
 	minSize = 50,
 	maxSize = 200,
@@ -42,8 +42,8 @@ export const DynamicBackground = ({
 			initialY: Math.random() * 100,
 			duration: Math.random() * (maxDuration - minDuration) + minDuration,
 			delay: Math.random() * 2,
-			scale: Math.random() * 0.5 + 0.5, // Random scale for depth effect
-			rotationSpeed: Math.random() * 360, // Random rotation speed
+			scale: Math.random() * 0.5 + 0.5,
+			rotationSpeed: Math.random() * 360,
 			color: `rgba(${baseColor}, ${
 				Math.random() * (maxOpacity - minOpacity) + minOpacity
 			})`,
@@ -62,16 +62,16 @@ export const DynamicBackground = ({
 	const moveVariants = {
 		animate: (sphere: Sphere) => ({
 			x: [
-				sphere.initialX + "%",
-				sphere.initialX - 20 + "%",
-				sphere.initialX + 20 + "%",
-				sphere.initialX + "%",
+				`${sphere.initialX}%`,
+				`${sphere.initialX - 20}%`,
+				`${sphere.initialX + 20}%`,
+				`${sphere.initialX}%`,
 			],
 			y: [
-				sphere.initialY + "%",
-				sphere.initialY + 20 + "%",
-				sphere.initialY - 20 + "%",
-				sphere.initialY + "%",
+				`${sphere.initialY}%`,
+				`${sphere.initialY + 20}%`,
+				`${sphere.initialY - 20}%`,
+				`${sphere.initialY}%`,
 			],
 			scale: [
 				sphere.scale,
