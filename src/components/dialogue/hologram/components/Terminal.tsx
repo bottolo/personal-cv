@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { useTerminalStore } from "../../../../store/terminal-store.ts";
+import { sequences } from "./sequences.ts";
 
 const TypewriterText = ({
 	text,
@@ -26,17 +27,6 @@ const TypewriterText = ({
 	}, [currentIndex, text, onComplete]);
 
 	return <span>{displayText}</span>;
-};
-
-const floatingAnimation = {
-	animate: {
-		y: [0, -10, 0],
-		transition: {
-			duration: 5,
-			repeat: Number.POSITIVE_INFINITY,
-			ease: "easeInOut",
-		},
-	},
 };
 
 const glowingAnimation = {
@@ -95,18 +85,8 @@ const Terminal = () => {
 	};
 
 	const processDialogueChange = (index = 0) => {
-		const changeSequence = [
-			"Changing communication...",
-			"...",
-			"...",
-			"Reconnecting...",
-			"...",
-			"...",
-			"Connected.",
-		];
-
-		if (index < changeSequence.length) {
-			addLine(changeSequence[index]);
+		if (index < sequences.change.length) {
+			addLine(sequences.change[index]);
 			setTimeout(() => processDialogueChange(index + 1), 1000);
 		} else {
 			finishDialogueChange();

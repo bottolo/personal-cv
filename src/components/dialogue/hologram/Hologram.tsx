@@ -91,12 +91,16 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 								size={300}
 							/>
 						</div>
-
+						<p
+							className={
+								"font-mono absolute right-2 bottom-1 text-sm text-blue-100/60"
+							}
+						>
+							bottolo/v0.1 | pre-release
+						</p>
 						{/* Canvas container */}
-						<div className="w-[240px] h-[250px] flex-shrink-0 absolute right-[0rem] top-[1rem]">
+						<div className="w-[300px] h-[310px] flex-shrink-0 absolute right-[-2.5rem] top-[0.5rem]">
 							<AsciiBox />
-							<p className="font-mono">samuele_castiglia</p>
-							<p className="font-mono">a.k.a. bottolo</p>
 						</div>
 					</motion.div>
 

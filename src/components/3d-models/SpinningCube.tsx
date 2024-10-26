@@ -47,7 +47,7 @@ export const AsciiBox = () => {
 			camera={{ position: [0, 0, 10], fov: 30 }}
 			style={{
 				userSelect: "none",
-				cursor: "pointer",
+				cursor: "none",
 				backgroundColor: "transparent",
 				width: "100%",
 				height: "100%",

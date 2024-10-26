@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { sequences } from "../components/dialogue/hologram/components/sequences.ts";
 
 interface TerminalState {
 	lines: string[];
@@ -33,24 +34,8 @@ export const useTerminalStore = create<TerminalState>((set) => ({
 	isChangingDialogue: false,
 	isWaitingForInput: false,
 	isAcceptingInput: true,
-	bootSequence: [
-		"Initiating communication...",
-		"...",
-		"...",
-		"Connecting...",
-		"...",
-		"...",
-		"Connected.",
-	],
-	shutdownSequence: [
-		"Initiating shutdown...",
-		"...",
-		"...",
-		"Disconnecting...",
-		"...",
-		"...",
-		"Disconnected. Shutting down.",
-	],
+	bootSequence: sequences.boot,
+	shutdownSequence: sequences.shutdown,
 	setBootSequence: (sequence) => set({ bootSequence: sequence }),
 	setShutdownSequence: (sequence) => set({ shutdownSequence: sequence }),
 	addLine: (line) => set((state) => ({ lines: [...state.lines, line] })),
