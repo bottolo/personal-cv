@@ -2,6 +2,7 @@ import { AnimatedBackground } from "./components/background/AnimatedBackground.t
 import { Cursor } from "./components/background/Cursor.tsx";
 import { Choices } from "./components/dialogue/choices/Choices.tsx";
 import { Hologram } from "./components/dialogue/hologram/Hologram.tsx";
+import { Projects } from "./components/projects/Projects.tsx";
 import { useDialogueStore } from "./store/dialogue-store.ts";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
 				/>
 			)}
 			<Cursor />
+			<Projects />
 		</div>
 	);
 }
