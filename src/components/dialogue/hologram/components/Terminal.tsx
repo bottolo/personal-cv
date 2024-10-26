@@ -174,10 +174,22 @@ const Terminal = () => {
 
 	const handleKeyDown = (e: KeyboardEvent) => {
 		if (e.key === "Enter") {
-			e.preventDefault();
 			handleContinue();
 		}
 	};
+
+	// Add useEffect hook to handle keyboard events
+	useEffect(() => {
+		// Only add the event listener if waiting for input and accepting input
+		if (isWaitingForInput && isAcceptingInput) {
+			document.addEventListener("keydown", handleKeyDown);
+
+			// Cleanup function to remove the event listener
+			return () => {
+				document.removeEventListener("keydown", handleKeyDown);
+			};
+		}
+	}, [isWaitingForInput, isAcceptingInput, currentLine, currentDialogue]);
 
 	const handleLineComplete = () => {
 		if (!isWaitingForInput) {
@@ -188,7 +200,6 @@ const Terminal = () => {
 	return (
 		<div className="absolute top-[37rem] left-[13rem] -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl z-[30]">
 			<div className="relative">
-				{/* Glowing border */}
 				<motion.div
 					variants={glowingAnimation}
 					animate="animate"
@@ -197,8 +208,6 @@ const Terminal = () => {
 						transform: "scale(1.02)",
 					}}
 				/>
-
-				{/* Terminal window */}
 				<div className="relative bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm text-blue-300 p-4 rounded-none shadow-lg border border-white/10">
 					<div
 						ref={terminalRef}
@@ -217,15 +226,12 @@ const Terminal = () => {
 								{index === lines.length - 1 &&
 									isWaitingForInput &&
 									index <= typingIndex && (
-										<button
-											tabIndex={0}
-											type="button"
+										<div
+											className="cursor-none w-full text-left text-blue-400/60 mt-2 hover:text-blue-300/80 focus:outline-none focus:ring-1 focus:ring-blue-400/30 rounded-none  animate-pulse transition-colors duration-200"
 											onClick={handleContinue}
-											onKeyDown={() => handleKeyDown}
-											className="cursor-none w-full text-left text-blue-400/60 mt-2 hover:text-blue-300/80 focus:outline-none focus:ring-1 focus:ring-blue-400/30 rounded-none px-2 animate-pulse transition-colors duration-200"
 										>
 											[press enter or click to continue...]
-										</button>
+										</div>
 									)}
 							</div>
 						))}
