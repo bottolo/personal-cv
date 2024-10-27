@@ -63,7 +63,6 @@ const GridOverlayBase = ({
 		return () => cancelAnimationFrame(animationFrame);
 	}, [enableScanLines, scanLinesSpeed, scanLinesOffset]);
 
-	// Initialize animation
 	useEffect(() => {
 		const cleanup = updateAnimation();
 		return () => cleanup?.();

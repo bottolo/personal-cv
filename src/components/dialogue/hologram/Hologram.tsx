@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { NoiseEffect } from "../../../utils/Noise.tsx";
-import { AsciiBox } from "../../3d-models/SpinningCube.tsx";
+import { AsciiCube } from "../../3d-models/AsciiCube.tsx";
 import { glowingAnimation } from "../../animations/glowing-animation.ts";
 import type { Dialogue } from "../types/dialogue-types.ts";
 import { HolographicAvatar } from "./components/Avatar.tsx";
@@ -90,7 +90,7 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 						</p>
 						{/* Canvas container */}
 						<div className="w-[300px] h-[310px] flex-shrink-0 absolute right-[-2.5rem] top-[0.5rem]">
-							<AsciiBox />
+							<AsciiCube />
 						</div>
 					</motion.div>
 
