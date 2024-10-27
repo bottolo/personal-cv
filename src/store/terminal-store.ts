@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { sequences } from "../components/dialogue/hologram/components/sequences.ts";
+import { sequences } from "../components/dialogue/hologram/components/sequences";
 
 interface TerminalState {
 	lines: string[];
@@ -16,6 +16,7 @@ interface TerminalState {
 	addLine: (line: string) => void;
 	clearLines: () => void;
 	nextLine: () => void;
+	setCurrentLine: (line: number) => void; // Add this
 	startBoot: () => void;
 	finishBoot: () => void;
 	startShutdown: () => void;
@@ -41,11 +42,13 @@ export const useTerminalStore = create<TerminalState>((set) => ({
 	addLine: (line) => set((state) => ({ lines: [...state.lines, line] })),
 	clearLines: () => set({ lines: [] }),
 	nextLine: () => set((state) => ({ currentLine: state.currentLine + 1 })),
+	setCurrentLine: (line) => set({ currentLine: line }), // Add this
 	startBoot: () =>
 		set({
 			isBooting: true,
 			isAcceptingInput: false,
 			isWaitingForInput: false,
+			currentLine: 0,
 		}),
 	finishBoot: () =>
 		set({
@@ -69,6 +72,7 @@ export const useTerminalStore = create<TerminalState>((set) => ({
 			isChangingDialogue: true,
 			isAcceptingInput: false,
 			isWaitingForInput: false,
+			currentLine: 0,
 		}),
 	finishDialogueChange: () =>
 		set({

@@ -24,13 +24,5 @@ export const sequences: Sequence = {
 		"...done.",
 		"shutting down...",
 	],
-	change: [
-		"closing communication...",
-		"...",
-		"...done.",
-		"disconnecting...",
-		"...",
-		"...done.",
-		"shutting down...",
-	],
+	change: ["", "changing communication...", "...", "...done."],
 };

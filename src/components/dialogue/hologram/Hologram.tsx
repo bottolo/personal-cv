@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { NoiseEffect } from "../../../utils/Noise.tsx";
 import { AsciiBox } from "../../3d-models/SpinningCube.tsx";
+import { glowingAnimation } from "../../animations/glowing-animation.ts";
 import type { Dialogue } from "../types/dialogue-types.ts";
 import { HolographicAvatar } from "./components/Avatar.tsx";
 import Terminal from "./components/Terminal.tsx";
@@ -35,17 +36,6 @@ const floatingAnimation = {
 		scale: 0.9,
 		transition: {
 			duration: 0.5,
-			ease: "easeInOut",
-		},
-	},
-};
-
-const glowingAnimation = {
-	animate: {
-		opacity: [0.7, 0.9, 0.7],
-		transition: {
-			duration: 2,
-			repeat: Number.POSITIVE_INFINITY,
 			ease: "easeInOut",
 		},
 	},
