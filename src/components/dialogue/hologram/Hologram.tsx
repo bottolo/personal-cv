@@ -83,21 +83,19 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 						</div>
 						<p
 							className={
-								"font-mono absolute right-2 bottom-1 text-sm text-blue-100/60"
+								"font-mono absolute opacity-70 right-2 top-1 text-[0.5rem] text-blue-100/60"
 							}
 						>
-							bottolo/v0.1 | pre-release
+							bottolo | v0.1 | pre-release
 						</p>
 						{/* Canvas container */}
-						<div className="w-[300px] h-[310px] flex-shrink-0 absolute right-[-2.5rem] top-[0.5rem]">
+						<div className="w-[300px] h-[310px] flex-shrink-0 absolute right-[-2.5rem] top-[2rem]">
 							<AsciiCube />
 						</div>
 					</motion.div>
 
 					{/* Terminal Section */}
-					<div>
-						<Terminal />
-					</div>
+					<Terminal />
 				</div>
 			</motion.div>
 		</AnimatePresence>

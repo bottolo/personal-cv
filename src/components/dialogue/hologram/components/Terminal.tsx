@@ -58,6 +58,66 @@ const GlitchText = ({ text }: { text: string }) => {
 	);
 };
 
+const GlitchContainer = ({ children }: { children: React.ReactNode }) => {
+	return (
+		<motion.div
+			className="relative"
+			initial="hidden"
+			animate="visible"
+			exit="exit"
+			variants={{
+				hidden: {
+					opacity: 0,
+					y: 20,
+					scale: 0.95,
+				},
+				visible: {
+					opacity: 1,
+					y: 0,
+					scale: 1,
+					transition: {
+						duration: 0.5,
+						ease: "easeOut",
+					},
+				},
+				exit: {
+					opacity: 0,
+					y: -20,
+					scale: 0.95,
+					transition: {
+						duration: 0.3,
+						ease: "easeIn",
+					},
+				},
+			}}
+		>
+			<motion.div
+				className="absolute inset-0 bg-blue-500/30"
+				animate={{
+					x: [0, -8, 4, -2, 0],
+					opacity: [0, 0.5, 0.3, 0.7, 0],
+				}}
+				transition={{
+					duration: 0.5,
+					times: [0, 0.2, 0.4, 0.6, 1],
+				}}
+			/>
+			<motion.div
+				className="absolute inset-0 bg-red-500/30"
+				animate={{
+					x: [0, 8, -4, 2, 0],
+					opacity: [0, 0.5, 0.3, 0.7, 0],
+				}}
+				transition={{
+					duration: 0.5,
+					times: [0, 0.2, 0.4, 0.6, 1],
+				}}
+			/>
+			{children}
+		</motion.div>
+	);
+};
+
 const Terminal = () => {
 	const { currentDialogue, currentPage, nextPage } = useDialogueStore();
 	const [displayText, setDisplayText] = useState("");
@@ -83,7 +143,6 @@ const Terminal = () => {
 		return () => clearInterval(intervalId);
 	}, []);
 
-	// Cursor blink effect
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setShowCursor((prev) => !prev);
@@ -91,7 +150,6 @@ const Terminal = () => {
 		return () => clearInterval(interval);
 	}, []);
 
-	// Handle typing effect
 	useEffect(() => {
 		if (!currentDialogue?.dialogue[currentPage]) return;
 
@@ -113,7 +171,6 @@ const Terminal = () => {
 		return () => clearInterval(typeInterval);
 	}, [currentDialogue, currentPage]);
 
-	// Handle key press
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
 			if (e.key === "Enter" && !isTyping && currentDialogue) {
@@ -125,92 +182,93 @@ const Terminal = () => {
 		return () => window.removeEventListener("keypress", handleKeyPress);
 	}, [isTyping, currentDialogue, nextPage]);
 
-	// Scroll to bottom effect
 	useEffect(() => {
 		if (terminalRef.current) {
 			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
 		}
 	}, [displayText]);
 
-	if (!currentDialogue) return null;
-
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: 20 }}
-			className="relative w-full"
-		>
-			<div className="relative bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm border border-white/10">
-				<motion.div
-					animate={{
-						boxShadow: [
-							"0 0 10px rgba(59, 130, 246, 0.2)",
-							"0 0 20px rgba(59, 130, 246, 0.4)",
-							"0 0 10px rgba(59, 130, 246, 0.2)",
-						],
-					}}
-					transition={{
-						duration: 2,
-						repeat: Number.POSITIVE_INFINITY,
-						ease: "easeInOut",
-					}}
-					className="absolute inset-[-1px] border border-white/20 bg-white/10 backdrop-blur-lg -z-10"
-				>
-					<NoiseEffect opacity={0.02} />
-				</motion.div>
-
-				<div
-					ref={terminalRef}
-					className="p-4 h-48 overflow-y-auto font-mono text-blue-200/90"
-				>
-					<div className="mb-2 flex items-center gap-2">
-						<div>
-							<span className="text-blue-400">guest</span>
-							<span className="text-gray-400">@</span>
-							<span className="text-purple-400">terminal</span>
-							<span className="text-gray-400">:~$ </span>
-						</div>
-					</div>
-
-					<div className="min-h-[20px] relative">
-						{displayText}
-						{showCursor && (
-							<motion.span
-								animate={{ opacity: [1, 0] }}
-								transition={{ duration: 0.5, repeat: Number.POSITIVE_INFINITY }}
-								className="absolute ml-1 text-blue-300"
+		<AnimatePresence mode="wait">
+			{currentDialogue && (
+				<motion.div className="absolute top-[20rem] left-[5rem] w-full z-[1000]">
+					<GlitchContainer>
+						<div className="relative bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm border border-white/10">
+							<motion.div
+								animate={{
+									boxShadow: [
+										"0 0 10px rgba(59, 130, 246, 0.2)",
+										"0 0 20px rgba(59, 130, 246, 0.4)",
+										"0 0 10px rgba(59, 130, 246, 0.2)",
+									],
+								}}
+								transition={{
+									duration: 2,
+									repeat: Number.POSITIVE_INFINITY,
+									ease: "easeInOut",
+								}}
+								className="absolute inset-[-1px] border border-white/20 bg-white/10 backdrop-blur-lg -z-10"
 							>
-								▊
-							</motion.span>
-						)}
-					</div>
+								<NoiseEffect opacity={0.02} />
+							</motion.div>
 
-					{!isTyping && (
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							className="text-blue-300/60 text-sm mt-2 italic"
-						>
-							Press Enter to continue...
-						</motion.div>
-					)}
-				</div>
-			</div>
+							<div
+								ref={terminalRef}
+								className="p-4 h-48 overflow-y-auto font-mono text-blue-200/90"
+							>
+								<div className="mb-2 flex items-center gap-2">
+									<div>
+										<span className="text-blue-400">guest</span>
+										<span className="text-gray-400">@</span>
+										<span className="text-purple-400">terminal</span>
+										<span className="text-gray-400">:~$ </span>
+									</div>
+								</div>
 
-			<AnimatePresence mode="wait">
-				<motion.div
-					key={currentWord}
-					initial={{ opacity: 0, y: 0 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: 0 }}
-					transition={{ duration: 0.3 }}
-					className="absolute bottom-2 right-2 text-xs text-blue-300/40"
-				>
-					{isGlitching ? <GlitchText text={currentWord} /> : currentWord}
+								<div className="min-h-[20px] relative">
+									{displayText}
+									{showCursor && (
+										<motion.span
+											animate={{ opacity: [1, 0] }}
+											transition={{
+												duration: 0.5,
+												repeat: Number.POSITIVE_INFINITY,
+											}}
+											className="absolute ml-1 text-blue-300"
+										>
+											▊
+										</motion.span>
+									)}
+								</div>
+
+								{!isTyping && (
+									<motion.div
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										className="text-blue-300/60 text-sm mt-2 italic"
+									>
+										Press Enter to continue...
+									</motion.div>
+								)}
+							</div>
+						</div>
+
+						<AnimatePresence mode="wait">
+							<motion.div
+								key={currentWord}
+								initial={{ opacity: 0, y: 0 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 0 }}
+								transition={{ duration: 0.3 }}
+								className="absolute bottom-2 right-2 text-xs text-blue-300/40"
+							>
+								{isGlitching ? <GlitchText text={currentWord} /> : currentWord}
+							</motion.div>
+						</AnimatePresence>
+					</GlitchContainer>
 				</motion.div>
-			</AnimatePresence>
-		</motion.div>
+			)}
+		</AnimatePresence>
 	);
 };
 

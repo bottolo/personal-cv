@@ -7,14 +7,17 @@ import type { Project } from "./projects.tsx";
 
 // Example components for each project
 
-export const Showcase = () => {
+interface ShowcaseProps {
+	className?: string;
+}
+export const Showcase = ({ className }: ShowcaseProps) => {
 	const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 	return (
 		<>
-			<div className="absolute h-[20rem] bottom-[3rem] left-[33rem] w-[35rem]">
+			<div className={className}>
 				<Canvas>
-					<PerspectiveCamera makeDefault position={[0, 0, 10]} fov={30} />
+					<PerspectiveCamera makeDefault position={[0, 0, 12]} fov={40} />
 					<ambientLight intensity={0.7} />
 					<pointLight position={[10, 10, 10]} intensity={1.5} />
 					<Carousel3D

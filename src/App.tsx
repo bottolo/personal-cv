@@ -32,11 +32,15 @@ function App() {
 			{currentDialogue && (
 				<Hologram
 					dialogue={currentDialogue}
-					className="absolute top-[15rem] left-[450px] transform -translate-x-1/2 -translate-y-1/2"
+					className="absolute top-[13.5rem] left-[20rem] transform -translate-x-1/2 -translate-y-1/2"
 				/>
 			)}
 			<Cursor />
-			{currentDialogue?.name === "/projects" && <Showcase />}
+			{currentDialogue?.name === "/projects" && (
+				<Showcase
+					className={"absolute h-[20rem] bottom-[3rem] left-[8rem] w-[35rem]"}
+				/>
+			)}
 		</div>
 	);
 }
