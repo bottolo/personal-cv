@@ -95,7 +95,7 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 					</motion.div>
 
 					{/* Terminal Section */}
-					<div className="p-4 mt-4">
+					<div>
 						<Terminal />
 					</div>
 				</div>
