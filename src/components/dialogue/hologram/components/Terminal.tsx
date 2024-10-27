@@ -71,8 +71,8 @@ const Terminal = () => {
 					{showCursor && <span className="opacity-70">▊</span>}
 				</div>
 				{!isTyping && (
-					<div className="text-gray-500 text-sm mt-2">
-						Press Enter to continue...
+					<div className="text-gray-500 text-sm mt-2 font-mono">
+						press enter to continue
 					</div>
 				)}
 			</div>
