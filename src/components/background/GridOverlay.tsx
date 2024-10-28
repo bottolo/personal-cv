@@ -1,29 +1,24 @@
 import { memo, useCallback, useEffect, useRef } from "react";
 
 interface GridOverlayProps {
-	// Grid customization
-	gridSize?: number; // Size of grid cells in pixels
-	gridOpacity?: number; // Grid line opacity (0-1)
+	gridSize?: number;
+	gridOpacity?: number;
 
-	// Scan lines customization
-	scanLinesOpacity?: number; // Opacity of scan lines
-	scanLinesSpeed?: number; // Duration in seconds
-	scanLinesSpacing?: number; // Spacing between scan lines in pixels
-	scanLinesOffset?: number; // Movement distance in pixels
+	scanLinesOpacity?: number;
+	scanLinesSpeed?: number;
+	scanLinesSpacing?: number;
+	scanLinesOffset?: number;
 
-	// Glare customization
-	glareOpacity?: number; // Screen glare opacity
-	glarePosition?: string; // Position of glare center (e.g., "50% 50%")
-	glareSize?: number; // Size of glare (0-100)
+	glareOpacity?: number;
+	glarePosition?: string;
+	glareSize?: number;
 
-	// Performance options
-	enableScanLines?: boolean; // Toggle scan line animation
-	enableGlare?: boolean; // Toggle glare effect
-	highPerformanceMode?: boolean; // Reduce effects for better performance
+	enableScanLines?: boolean;
+	enableGlare?: boolean;
+	highPerformanceMode?: boolean;
 }
 
 const GridOverlayBase = ({
-	// Default values for all parameters
 	gridSize = 20,
 	gridOpacity = 0.03,
 	scanLinesOpacity = 0.5,
@@ -39,7 +34,6 @@ const GridOverlayBase = ({
 }: GridOverlayProps) => {
 	const scanLinesRef = useRef<HTMLDivElement>(null);
 
-	// Performance optimization for animation
 	const updateAnimation = useCallback(() => {
 		if (!scanLinesRef.current || !enableScanLines) return;
 
@@ -59,7 +53,6 @@ const GridOverlayBase = ({
 
 		const animationFrame = requestAnimationFrame(animate);
 
-		// Cleanup animation frame on unmount or when disabled
 		return () => cancelAnimationFrame(animationFrame);
 	}, [enableScanLines, scanLinesSpeed, scanLinesOffset]);
 

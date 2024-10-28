@@ -2,8 +2,8 @@ import { Choices } from "./components/dialogue/choices/Choices.tsx";
 import { Hologram } from "./components/dialogue/hologram/Hologram.tsx";
 
 import { AnimatedBackground } from "./components/background/AnimatedBackground.tsx";
-import { Cursor } from "./components/background/Cursor.tsx";
 import { GridOverlay } from "./components/background/GridOverlay.tsx";
+import { Cursor } from "./components/cursor/Cursor.tsx";
 import { Showcase } from "./components/projects/Showcase.tsx";
 import { useDialogueStore } from "./store/dialogue-store.ts";
 
