@@ -12,7 +12,7 @@ import { useRef } from "react";
 import * as THREE from "three";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { cn } from "../../../../utils/cn.ts";
-import { ChoiceButton } from "./ChoiceButton.tsx";
+import { ChoiceButton } from "./choice-button.tsx";
 
 interface DialogueChoiceProps {
 	text?: string;

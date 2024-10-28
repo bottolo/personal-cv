@@ -11,7 +11,7 @@ interface Image3DProps {
 	isActive?: boolean;
 }
 
-export const Image3D = memo(
+export const Image3d = memo(
 	({
 		url,
 		scale,
@@ -68,4 +68,4 @@ export const Image3D = memo(
 	},
 );
 
-Image3D.displayName = "Image3D";
+Image3d.displayName = "Image3d";

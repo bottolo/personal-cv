@@ -1,45 +1,16 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { NoiseEffect } from "../../../utils/Noise.tsx";
-import { AsciiCube } from "../../3d-models/AsciiCube.tsx";
 import { glowingAnimation } from "../../animations/glowing-animation.ts";
 import type { Dialogue } from "../types/dialogue-types.ts";
-import { HolographicAvatar } from "./components/Avatar.tsx";
-import Terminal from "./components/Terminal.tsx";
+import { AsciiGeometry } from "./components/ascii-geometry/AsciiGeometry.tsx";
+import { HolographicAvatar } from "./components/avatar/Avatar.tsx";
+import Terminal from "./components/terminal/Terminal.tsx";
+import { hologramFloatingAnimation } from "./hologram-floating-animation.ts";
 
 interface DialogueHologramProps {
 	dialogue: Dialogue;
 	className?: string;
 }
-
-const floatingAnimation = {
-	initial: {
-		x: 0,
-		y: 0,
-		opacity: 0,
-		scale: 0.9,
-	},
-	animate: {
-		x: [0, 8, 0],
-		y: [0, -8, 0],
-		opacity: 1,
-		scale: 1,
-		transition: {
-			duration: Number.POSITIVE_INFINITY,
-			repeat: Number.POSITIVE_INFINITY,
-			ease: "easeInOut",
-			opacity: { duration: 0.5 },
-			scale: { duration: 0.5 },
-		},
-	},
-	exit: {
-		opacity: 0,
-		scale: 0.9,
-		transition: {
-			duration: 0.5,
-			ease: "easeInOut",
-		},
-	},
-};
 
 export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 	return (
@@ -53,7 +24,7 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 				<div className="w-[600px] relative">
 					{/* Main Container */}
 					<motion.div
-						variants={floatingAnimation}
+						variants={hologramFloatingAnimation}
 						className="relative z-20 flex items-center gap-8 p-6 bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm rounded-none border border-white/10"
 					>
 						{/* Glowing border */}
@@ -90,7 +61,7 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 						</p>
 						{/* Canvas container */}
 						<div className="w-[300px] h-[310px] flex-shrink-0 absolute right-[-2.5rem] top-[2rem]">
-							<AsciiCube />
+							<AsciiGeometry />
 						</div>
 					</motion.div>
 

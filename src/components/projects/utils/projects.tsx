@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Mediations } from "./details/Mediations.tsx";
-import { Noclip } from "./details/Noclip.tsx";
+import { Mediations } from "../details/sections/Mediations.tsx";
+import { Noclip } from "../details/sections/Noclip.tsx";
 
 export type Project = {
 	id: number;

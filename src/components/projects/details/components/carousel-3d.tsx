@@ -2,14 +2,14 @@ import { useFrame } from "@react-three/fiber";
 import { motion } from "framer-motion-3d";
 import { memo, useCallback, useRef } from "react";
 import type * as THREE from "three";
-import { type Project, projects } from "../projects.tsx";
-import { Image3D } from "./Image3D.tsx";
+import { type Project, projects } from "../../utils/projects.tsx";
+import { Image3d } from "./image-3d.tsx";
 
 interface Carousel3DProps {
 	onProjectSelect: (project: Project) => void;
 }
 
-export const Carousel3D = memo(({ onProjectSelect }: Carousel3DProps) => {
+export const Carousel3d = memo(({ onProjectSelect }: Carousel3DProps) => {
 	const groupRef = useRef<THREE.Group>(null);
 	const rotationRef = useRef(0);
 	const targetRotationRef = useRef(0);
@@ -76,7 +76,7 @@ export const Carousel3D = memo(({ onProjectSelect }: Carousel3DProps) => {
 							damping: 20,
 						}}
 					>
-						<Image3D
+						<Image3d
 							url={project.image}
 							scale={[5, 5, 5]}
 							rotation={[0, Math.PI, 0]}
@@ -112,4 +112,4 @@ export const Carousel3D = memo(({ onProjectSelect }: Carousel3DProps) => {
 	);
 });
 
-Carousel3D.displayName = "Carousel3D";
+Carousel3d.displayName = "Carousel3d";

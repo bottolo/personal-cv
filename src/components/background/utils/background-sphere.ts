@@ -1,4 +1,4 @@
-export type Sphere = {
+export type BackgroundSphere = {
 	id: number;
 	size: number;
 	initialX: number;

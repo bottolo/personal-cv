@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { useDialogueStore } from "../../../store/dialogue-store.ts";
 import { DIALOGUES } from "../dialogues.tsx";
-import { ChoiceCanvas } from "./components/ChoiceCanvas.tsx";
+import { ChoiceCanvas } from "./components/choice-canvas.tsx";
 
 interface PositionConfig {
 	bottom: string;

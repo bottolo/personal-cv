@@ -1,4 +1,3 @@
-import { Projects } from "./Projects.tsx";
 import type { Dialogue } from "./types/dialogue-types.ts";
 
 export const DIALOGUES: Record<string, Dialogue> = {
@@ -11,7 +10,6 @@ export const DIALOGUES: Record<string, Dialogue> = {
 			"Feel free to explore and ask questions!",
 		],
 		avatar: "idle",
-		custom: <Projects />,
 	},
 	secondChoice: {
 		id: "secondChoice",

@@ -1,11 +1,9 @@
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
-import { Carousel3D } from "./components/Carousel3D.tsx";
-import { Details } from "./components/Details.tsx";
-import type { Project } from "./projects.tsx";
-
-// Example components for each project
+import { Details } from "./details/Details.tsx";
+import { Carousel3d } from "./details/components/carousel-3d.tsx";
+import type { Project } from "./utils/projects.tsx";
 
 interface ShowcaseProps {
 	className?: string;
@@ -20,7 +18,7 @@ export const Showcase = ({ className }: ShowcaseProps) => {
 					<PerspectiveCamera makeDefault position={[0, 0, 12]} fov={40} />
 					<ambientLight intensity={0.7} />
 					<pointLight position={[10, 10, 10]} intensity={1.5} />
-					<Carousel3D
+					<Carousel3d
 						onProjectSelect={(project: Project) => setSelectedProject(project)}
 					/>
 					<OrbitControls

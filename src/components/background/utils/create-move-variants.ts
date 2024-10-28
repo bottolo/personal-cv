@@ -1,7 +1,7 @@
-import type { Sphere } from "./sphere.ts";
+import type { BackgroundSphere } from "./background-sphere.ts";
 
 export const createMoveVariants = () => ({
-	animate: (sphere: Sphere) => ({
+	animate: (sphere: BackgroundSphere) => ({
 		x: [
 			`${sphere.initialX}%`,
 			`${sphere.initialX - 20}%`,

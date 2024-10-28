@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 export type AvatarVariant = "talking" | "idle";
 
 export interface Dialogue {
@@ -8,7 +6,6 @@ export interface Dialogue {
 	dialogue: string[];
 	avatar: AvatarVariant;
 	completed?: boolean;
-	custom?: ReactNode;
 	autoskip?: boolean;
 	delay?: number;
 }
