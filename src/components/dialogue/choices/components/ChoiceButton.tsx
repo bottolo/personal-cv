@@ -109,7 +109,6 @@ export const ChoiceButton = ({
 			(currentConfig.box.rotation[2] - meshRef.current.rotation.z) *
 			rotationLerpFactor;
 
-		// Text transitions
 		const textLerpFactor = !isHovered && !active ? 0.15 : 0.1;
 		textRef.current.position.x +=
 			(currentConfig.text.position[0] - textRef.current.position.x) *

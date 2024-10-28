@@ -103,7 +103,7 @@ export const Choices = () => {
 	};
 
 	return (
-		<div className="fixed h-screen w-full z-[5000]">
+		<div className="fixed h-screen w-full">
 			{Object.entries(DIALOGUES).map(([dialogueId, dialogue]) => {
 				const isActive = currentDialogue?.id === dialogueId;
 

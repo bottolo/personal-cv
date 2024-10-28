@@ -1,9 +1,9 @@
 import { AsciiRenderer } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion-3d";
+import { memo, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-// Memoize geometry definitions
 const GEOMETRIES = Object.freeze([
 	{ type: "BoxGeometry", args: [3, 3, 3] },
 	{ type: "TorusGeometry", args: [1.5, 0.5, 16, 32] },
@@ -14,83 +14,88 @@ const GEOMETRIES = Object.freeze([
 	{ type: "TorusKnotGeometry", args: [1.5, 0.5, 128, 16] },
 ]);
 
-// Pre-create geometries to avoid recreation on each render
 const geometryInstances = GEOMETRIES.map(
 	({ type, args }) => new THREE[type](...args),
 );
 
-// Memoize material
-const material = new THREE.MeshStandardMaterial({ color: "white" });
-
-const SpinningGeometry = memo(() => {
-	const meshRef = useRef<THREE.Mesh>(null);
+const SpinningGeometry = memo(function SpinningGeometry() {
+	const groupRef = useRef<THREE.Group>();
+	const meshRef = useRef<THREE.Mesh>();
 	const [geometryIndex, setGeometryIndex] = useState(0);
-
-	// Optimize rotation values with useRef to avoid re-renders
+	const [hovered, setHovered] = useState(false);
 	const rotationRef = useRef({ x: 0, y: 0 });
 
 	useFrame((state, delta) => {
-		if (meshRef.current) {
-			rotationRef.current.y += delta * 0.5;
-			rotationRef.current.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+		rotationRef.current.y += delta * 0.5;
+		rotationRef.current.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
 
+		if (meshRef.current) {
 			meshRef.current.rotation.y = rotationRef.current.y;
 			meshRef.current.rotation.x = rotationRef.current.x;
 		}
 	});
 
-	const handleClick = useCallback(() => {
-		setGeometryIndex((prev) => (prev + 1) % GEOMETRIES.length);
-	}, []);
-
-	// Memoize initial rotation
-	const initialRotation = useMemo(() => [0, Math.PI * 0.25, 0], []);
+	const variants = {
+		idle: {
+			scale: 1,
+		},
+		hover: {
+			scale: 1.1,
+			transition: {
+				duration: 0.3,
+				ease: "easeInOut",
+			},
+		},
+	};
 
 	return (
-		<mesh
-			ref={meshRef}
-			rotation={initialRotation}
-			onClick={handleClick}
-			geometry={geometryInstances[geometryIndex]}
-			material={material}
+		<group
+			ref={groupRef}
+			onClick={() => setGeometryIndex((prev) => (prev + 1) % GEOMETRIES.length)}
+			onPointerOver={() => setHovered(true)}
+			onPointerOut={() => setHovered(false)}
+		>
+			<motion.mesh
+				ref={meshRef}
+				geometry={geometryInstances[geometryIndex]}
+				variants={variants}
+				initial="idle"
+				animate={hovered ? "hover" : "idle"}
+			>
+				<meshBasicMaterial color="white" />
+			</motion.mesh>
+		</group>
+	);
+});
+
+const Lights = memo(function Lights() {
+	return (
+		<>
+			<ambientLight intensity={0.5} />
+			<spotLight
+				position={[10, 10, 10]}
+				angle={0.15}
+				penumbra={1}
+				intensity={1}
+			/>
+			<pointLight position={[-10, -10, -10]} intensity={0.5} />
+		</>
+	);
+});
+
+const AsciiRendererConfig = memo(function AsciiRendererConfig() {
+	return (
+		<AsciiRenderer
+			invert={false}
+			fgColor="white"
+			bgColor="transparent"
+			resolution={0.3}
+			characters=" .:-+*=%@#"
 		/>
 	);
 });
 
-SpinningGeometry.displayName = "SpinningGeometry";
-
-// Memoize light setup
-const Lights = memo(() => (
-	<>
-		<ambientLight intensity={0.5} />
-		<spotLight
-			position={[10, 10, 10]}
-			angle={0.15}
-			penumbra={1}
-			intensity={1}
-		/>
-		<pointLight position={[-10, -10, -10]} intensity={0.5} />
-	</>
-));
-
-Lights.displayName = "Lights";
-
-// Memoize ASCII renderer configuration
-const AsciiRendererConfig = memo(() => (
-	<AsciiRenderer
-		invert={false}
-		fgColor="white"
-		bgColor="transparent"
-		resolution={0.3}
-		characters=" .:-+*=%@#"
-	/>
-));
-
-AsciiRendererConfig.displayName = "AsciiRendererConfig";
-
-// Main component
-export const AsciiCube = memo(() => {
-	// Memoize camera settings
+export const AsciiCube = memo(function AsciiCube() {
 	const cameraSettings = useMemo(
 		() => ({
 			position: [0, 0, 10] as [number, number, number],
@@ -99,11 +104,10 @@ export const AsciiCube = memo(() => {
 		[],
 	);
 
-	// Memoize canvas style
 	const canvasStyle = useMemo(
 		() => ({
 			userSelect: "none" as const,
-			cursor: "none" as const,
+			cursor: "pointer",
 			backgroundColor: "transparent",
 			width: "100%",
 			height: "100%",
@@ -115,8 +119,8 @@ export const AsciiCube = memo(() => {
 		<Canvas
 			camera={cameraSettings}
 			style={canvasStyle}
-			dpr={Math.min(window.devicePixelRatio, 2)} // Limit DPR for better performance
-			performance={{ min: 0.5 }} // Allow frame rate to drop for better performance
+			dpr={Math.min(window.devicePixelRatio, 2)}
+			performance={{ min: 0.5 }}
 		>
 			<Lights />
 			<SpinningGeometry />
@@ -124,5 +128,3 @@ export const AsciiCube = memo(() => {
 		</Canvas>
 	);
 });
-
-AsciiCube.displayName = "AsciiBox";
