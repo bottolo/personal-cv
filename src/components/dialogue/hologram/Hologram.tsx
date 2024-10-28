@@ -1,14 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { NoiseEffect } from "../../../utils/Noise.tsx";
+import { NoiseEffect } from "../../../utils/NoiseEffect.tsx";
 import { glowingAnimation } from "../../animations/glowing-animation.ts";
-import type { Dialogue } from "../types/dialogue-types.ts";
 import { AsciiGeometry } from "./components/ascii-geometry/AsciiGeometry.tsx";
 import { HolographicAvatar } from "./components/avatar/Avatar.tsx";
 import Terminal from "./components/terminal/Terminal.tsx";
 import { hologramFloatingAnimation } from "./hologram-floating-animation.ts";
 
 interface DialogueHologramProps {
-	dialogue: Dialogue;
 	className?: string;
 }
 

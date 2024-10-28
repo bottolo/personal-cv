@@ -1,4 +1,3 @@
-// Noise Canvas Component
 import { useEffect, useRef } from "react";
 
 export const NoiseEffect = ({ opacity = 0.05 }) => {
@@ -18,7 +17,7 @@ export const NoiseEffect = ({ opacity = 0.05 }) => {
 
 			for (let i = 0; i < buffer.length; i++) {
 				if (Math.random() < 0.5) {
-					buffer[i] = 0xffffffff; // white pixel
+					buffer[i] = 0xffffffff;
 				}
 			}
 

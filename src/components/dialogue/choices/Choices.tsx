@@ -15,7 +15,10 @@ interface PositionsConfig {
 	active: Record<string, Record<string, PositionConfig>>;
 }
 
-export const Choices = () => {
+interface ChoicesProps {
+	className?: string;
+}
+export const Choices = ({ className }: ChoicesProps) => {
 	const { currentDialogue } = useDialogueStore();
 
 	const positions = useMemo(
@@ -103,14 +106,14 @@ export const Choices = () => {
 	};
 
 	return (
-		<div className="fixed h-screen w-full">
+		<>
 			{Object.entries(DIALOGUES).map(([dialogueId, dialogue]) => {
 				const isActive = currentDialogue?.id === dialogueId;
 
 				return (
 					<motion.div
 						key={dialogueId}
-						className="absolute"
+						className="fixed"
 						initial={positions.default[dialogueId]}
 						animate={getPosition(dialogueId)}
 						transition={{
@@ -125,10 +128,11 @@ export const Choices = () => {
 							active={isActive}
 							dialogueId={dialogueId}
 							debug={false}
+							className={className}
 						/>
 					</motion.div>
 				);
 			})}
-		</div>
+		</>
 	);
 };

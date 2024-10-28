@@ -59,10 +59,7 @@ export const ChoiceCanvas = ({
 
 	return (
 		<motion2d.div
-			className={cn(
-				`absolute bottom-[50px] right-[200px] w-[650px] h-[300px] bg-transparent ${className}`,
-				debug && "border-2 border-red-500",
-			)}
+			className={cn(className, debug && "border-2 border-red-500")}
 			whileHover={{ scale: 1.02 }}
 			whileTap={{ scale: 0.98 }}
 		>

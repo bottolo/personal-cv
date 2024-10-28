@@ -119,5 +119,4 @@ const GridOverlayBase = ({
 	);
 };
 
-// Memoize the component to prevent unnecessary re-renders
 export const GridOverlay = memo(GridOverlayBase);
