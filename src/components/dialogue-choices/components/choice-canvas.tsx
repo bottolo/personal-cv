@@ -10,8 +10,8 @@ import { motion as motion2d } from "framer-motion";
 import { BlendFunction } from "postprocessing";
 import { useRef } from "react";
 import * as THREE from "three";
-import { useDialogueStore } from "../../../../store/dialogue-store.ts";
-import { cn } from "../../../../utils/cn.ts";
+import { useDialogueStore } from "../../../store/dialogue-store.ts";
+import { cn } from "../../../utils/cn.ts";
 import { ChoiceButton } from "./choice-button.tsx";
 
 interface DialogueChoiceProps {

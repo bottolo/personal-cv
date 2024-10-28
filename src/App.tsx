@@ -1,10 +1,9 @@
-import { Choices } from "./components/dialogue/choices/Choices.tsx";
-import { Hologram } from "./components/dialogue/hologram/Hologram.tsx";
+import { Choices } from "./components/dialogue-choices/Choices.tsx";
+import { Hologram } from "./components/dialogue-hologram/Hologram.tsx";
 
-import { AnimatedGeometry } from "./components/background/components/animated-geometry/AnimatedGeometry.tsx";
-import { GridOverlay } from "./components/background/components/grid-overlay/GridOverlay.tsx";
+import { Background } from "./components/background/Background.tsx";
 import { Cursor } from "./components/cursor/Cursor.tsx";
-import { Showcase } from "./components/projects/Showcase.tsx";
+import { Showcase } from "./components/dialogue-projects/Showcase.tsx";
 import { useDialogueStore } from "./store/dialogue-store.ts";
 
 function App() {
@@ -13,20 +12,7 @@ function App() {
 	return (
 		<div className="w-screen h-screen z-[9998] bg-transparent border-[30px] border-white rounded-md cursor-none overflow-auto shadow-blue-500/50">
 			<Cursor />
-			<AnimatedGeometry
-				sphereCount={30}
-				planesCount={10}
-				minSize={10}
-				maxSize={300}
-				minDuration={20}
-				maxDuration={50}
-				baseColor="255, 255, 255"
-				minOpacity={0.05}
-				maxOpacity={0.3}
-				depthLayers={10}
-			/>
-
-			<GridOverlay />
+			<Background />
 
 			<Choices
 				className={

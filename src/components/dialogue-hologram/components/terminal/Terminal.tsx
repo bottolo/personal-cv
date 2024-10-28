@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { useDialogueStore } from "../../../../../store/dialogue-store.ts";
-import { NoiseEffect } from "../../../../../utils/NoiseEffect.tsx";
+import { useDialogueStore } from "../../../../store/dialogue-store.ts";
+import { NoiseEffect } from "../../../../utils/NoiseEffect.tsx";
 import { GlitchContainer } from "./utils/glitch-container.tsx";
 import { GlitchText } from "./utils/glitch-text.tsx";
 import { INTROSPECTIVE_WORDS } from "./utils/introspective-words.ts";

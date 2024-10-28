@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { motion } from "framer-motion-3d";
 import { memo, useRef, useState } from "react";
 import * as THREE from "three";
-import { asciiGeometryAnimation } from "../../../../../animations/ascii-geometry-animation.ts";
+import { asciiGeometryAnimation } from "../../../../animations/ascii-geometry-animation.ts";
 import { GEOMETRIES } from "./ascii-geometries-config.ts";
 
 interface GeometryProps {

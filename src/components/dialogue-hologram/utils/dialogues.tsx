@@ -1,4 +1,4 @@
-import type { Dialogue } from "./types/dialogue-types.ts";
+import type { Dialogue } from "../types/dialogue-types.ts";
 
 export const DIALOGUES: Record<string, Dialogue> = {
 	firstChoice: {
