@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { memo, useMemo } from "react";
-import { NoiseEffect } from "../../../../utils/NoiseEffect.tsx";
+import { NoiseEffect } from "../../../../global-utils/NoiseEffect.tsx";
 import { GlitchEffect } from "./utils/glitch-effect.tsx";
 import { OverlayEffects } from "./utils/overlay-effects.tsx";
 import { Scanlines } from "./utils/scanlines.tsx";

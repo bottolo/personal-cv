@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { glowingAnimation } from "../../animations/glowing-animation.ts";
-import type { Project } from "../utils/projects.tsx";
+import { glowingAnimation } from "../../../animations/glowing-animation.ts";
+import type { Project } from "../../utils/projects.tsx";
 
 interface DetailsProps {
 	project: Project;

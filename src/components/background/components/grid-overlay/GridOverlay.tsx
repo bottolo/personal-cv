@@ -65,7 +65,7 @@ const GridOverlayBase = ({
 		<div className="fixed inset-0 pointer-events-none">
 			{/* Grid Pattern */}
 			<div
-				className="absolute inset-0 z-[9999] will-change-transform"
+				className="absolute inset-0 z-[9998] will-change-transform"
 				style={{
 					backgroundImage: `
             linear-gradient(rgba(255,255,255,${gridOpacity}) 1px, transparent 1px),

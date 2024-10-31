@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { motion } from "framer-motion-3d";
 import { memo, useCallback, useRef } from "react";
 import type * as THREE from "three";
-import { type Project, projects } from "../../utils/projects.tsx";
+import { type Project, projects } from "../../../utils/projects.tsx";
 import { Image3d } from "./image-3d.tsx";
 
 interface Carousel3DProps {

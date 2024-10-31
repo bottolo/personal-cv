@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { memo, useMemo, useState } from "react";
-import { generateRandomInRange } from "../../../../utils/generate-random-in-range.ts";
+import { generateRandomInRange } from "../../../../global-utils/generate-random-in-range.ts";
 import { ShapeComponent } from "./shapes/shapes.tsx";
 
 interface AnimatedBackgroundProps {

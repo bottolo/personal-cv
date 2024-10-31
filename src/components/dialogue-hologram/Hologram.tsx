@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { NoiseEffect } from "../../utils/NoiseEffect.tsx";
+import { NoiseEffect } from "../../global-utils/NoiseEffect.tsx";
 import { glowingAnimation } from "../animations/glowing-animation.ts";
 import { AsciiGeometry } from "./components/ascii-geometry/AsciiGeometry.tsx";
 import { HolographicAvatar } from "./components/avatar/Avatar.tsx";
@@ -23,7 +23,7 @@ export const Hologram = ({ className = "" }: DialogueHologramProps) => {
 					{/* Main Container */}
 					<motion.div
 						variants={hologramFloatingAnimation}
-						className="relative z-20 flex items-center gap-8 p-6 bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm rounded-none border border-white/10"
+						className="absolute w-[42rem] z-20 flex items-center gap-8 p-6 bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm rounded-none border border-white/10"
 					>
 						{/* Glowing border */}
 						<motion.div

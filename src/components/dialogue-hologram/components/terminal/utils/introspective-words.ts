@@ -17,4 +17,5 @@ export const INTROSPECTIVE_WORDS = [
 	"being",
 	"awareness",
 	"mystery",
+	"heir to heir",
 ];

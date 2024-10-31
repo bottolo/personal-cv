@@ -1,8 +1,8 @@
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
-import { Details } from "./details/Details.tsx";
-import { Carousel3d } from "./details/components/carousel-3d.tsx";
+import { Details } from "./components/details/Details.tsx";
+import { Carousel3d } from "./components/details/utils/carousel-3d.tsx";
 import type { Project } from "./utils/projects.tsx";
 
 interface ShowcaseProps {
