@@ -1,5 +1,5 @@
 import { Environment } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
 	Bloom,
 	ChromaticAberration,
@@ -8,9 +8,10 @@ import {
 	Scanline,
 } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize, Resolution } from "postprocessing";
-import { Suspense, memo, useMemo } from "react";
+import { Suspense, memo, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { cn } from "../../../../global-utils/cn.ts";
+import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { Cube } from "../../../3d-models/Cube.tsx";
 import { Dodecahedron } from "../../../3d-models/Dodecahedron.tsx";
 import { Sphere } from "../../../3d-models/Sphere.tsx";
@@ -38,7 +39,6 @@ const solidMaterial = {
 
 // Scene component to enable React.memo
 const Scene = memo(() => {
-	// Use instances for repeated geometries
 	const sphereGeometry = useMemo(() => new THREE.SphereGeometry(1, 32, 32), []);
 	const cubeGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
 
@@ -60,7 +60,7 @@ const Scene = memo(() => {
 			</Suspense>
 
 			<Dodecahedron
-				position={[-5, 1, 7]}
+				position={[-3, 1, 3]}
 				materialOptions={wireframeMaterial}
 				scale={2}
 			/>
@@ -82,7 +82,7 @@ const Scene = memo(() => {
 						opacity: 1,
 						emissiveIntensity: 1,
 					}}
-					scale={50}
+					scale={60}
 				/>
 				<Sphere
 					position={[-10, -20, -15]}
@@ -112,7 +112,7 @@ const Scene = memo(() => {
 					scale={25}
 				/>
 				<Cube
-					position={[40, -30, -10]}
+					position={[40, -50, -10]}
 					rotation={[0, 0.5, 6]}
 					materialOptions={{
 						...solidMaterial,
@@ -124,6 +124,68 @@ const Scene = memo(() => {
 		</>
 	);
 });
+
+const CAMERA_POSITIONS = {
+	firstChoice: {
+		position: new THREE.Vector3(8, 20, 0),
+		target: new THREE.Vector3(-3.5, 1, 3),
+	},
+	secondChoice: {
+		position: new THREE.Vector3(-5, 0, 8),
+		target: new THREE.Vector3(-5, 1, 7),
+	},
+	thirdChoice: {
+		position: new THREE.Vector3(15, 15, -30),
+		target: new THREE.Vector3(-10, -20, 15),
+	},
+	default: {
+		position: new THREE.Vector3(-5, 2, 10.5),
+		target: new THREE.Vector3(-3.5, 1, 3),
+	},
+};
+
+// Camera controller component
+const CameraController = () => {
+	const { camera } = useThree();
+	const { currentDialogue } = useDialogueStore();
+	const targetPosition = useRef(CAMERA_POSITIONS.default.position.clone());
+	const targetLookAt = useRef(CAMERA_POSITIONS.default.target.clone());
+
+	useEffect(() => {
+		if (currentDialogue) {
+			const cameraConfig =
+				CAMERA_POSITIONS[currentDialogue.id] ||
+				Object.entries(CAMERA_POSITIONS).find(
+					([key]) => key === currentDialogue.name,
+				)?.[1] ||
+				CAMERA_POSITIONS.default;
+
+			targetPosition.current.copy(cameraConfig.position);
+			targetLookAt.current.copy(cameraConfig.target);
+		} else {
+			targetPosition.current.copy(CAMERA_POSITIONS.default.position);
+			targetLookAt.current.copy(CAMERA_POSITIONS.default.target);
+		}
+	}, [currentDialogue]);
+
+	useFrame(() => {
+		// Smooth camera position movement
+		camera.position.lerp(targetPosition.current, 0.02);
+
+		// Smooth camera look-at movement
+		const currentLookAt = new THREE.Vector3();
+		camera.getWorldDirection(currentLookAt);
+		const targetDirection = targetLookAt.current
+			.clone()
+			.sub(camera.position)
+			.normalize();
+
+		const newDirection = currentLookAt.lerp(targetDirection, 0.02);
+		camera.lookAt(camera.position.clone().add(newDirection));
+	});
+
+	return null;
+};
 
 interface AnimatedRingsProps {
 	className?: string;
@@ -142,11 +204,12 @@ export const AnimatedRings = ({ className }: AnimatedRingsProps) => {
 			>
 				<color attach="background" args={["#371d95"]} />
 				<Scene />
+				<CameraController />
 				<EffectComposer multisampling={0}>
 					{/* Disable multisampling for better performance */}
 					<Bloom
 						intensity={15}
-						kernelSize={KernelSize.MEDIUM} // Reduced from LARGE
+						kernelSize={KernelSize.VERY_LARGE} // Reduced from LARGE
 						luminanceThreshold={0.9}
 						luminanceSmoothing={0.05}
 						mipmapBlur={true}

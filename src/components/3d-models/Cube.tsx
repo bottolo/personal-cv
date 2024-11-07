@@ -6,10 +6,6 @@ import type { GeometricProps } from "./utils/geometry-props.ts";
 import { defaultMaterialOptions } from "./utils/material-options.ts";
 import { defaultRotationOptions } from "./utils/rotation-options.ts";
 
-// Shared types
-
-// Geometry-specific options
-
 interface CubeOptions {
 	width?: number;
 	height?: number;
@@ -32,7 +28,6 @@ const defaultCubeOptions: CubeOptions = {
 	depthSegments: 1,
 };
 
-// Cube Component
 export function Cube({
 	materialOptions = defaultMaterialOptions,
 	rotationOptions = defaultRotationOptions,

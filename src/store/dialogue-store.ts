@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { Dialogue } from "../components/dialogue-hologram/types/dialogue-types.ts";
-import { DIALOGUES } from "../components/dialogue-hologram/utils/dialogues.tsx";
+import type { Dialogue } from "../global-utils/dialogue-types.ts";
+import { DIALOGUES } from "../global-utils/dialogues.tsx";
 
 interface DialogueState {
 	currentDialogue: Dialogue | null;

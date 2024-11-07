@@ -7,7 +7,8 @@ interface CursorProps {
 	thickness?: number;
 	lineThickness?: number;
 }
-export function Cursor({
+
+export default function Cursor({
 	defaultColor = "white",
 	size = 40,
 	thickness = 2,
@@ -28,14 +29,13 @@ export function Cursor({
 		};
 
 		window.addEventListener("mousemove", updatePosition);
-
 		return () => {
 			window.removeEventListener("mousemove", updatePosition);
 		};
 	}, [defaultColor]);
 
 	return (
-		<motion.div className="fixed inset-0 pointer-events-none z-[9998]">
+		<motion.div className="fixed inset-0 pointer-events-none z-[9999]">
 			{/* Horizontal line */}
 			<div
 				className="absolute w-full"
@@ -58,14 +58,13 @@ export function Cursor({
 
 			{/* Hollow square cursor */}
 			<div
-				className={"absolute"}
+				className="absolute transform -translate-x-1/2 -translate-y-1/2"
 				style={{
-					left: `${position.x - size / 2 + 20.5}px`,
-					top: `${position.y - size / 2 + 20.5}px`,
+					left: `${position.x}px`,
+					top: `${position.y}px`,
 					width: `${size}px`,
 					height: `${size}px`,
 					border: `${thickness}px solid ${currentColor}`,
-					transform: "translate(-50%, -50%)",
 				}}
 			/>
 		</motion.div>

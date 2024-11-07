@@ -57,7 +57,6 @@ export function Halottolo({
 	const { nodes } = useGLTF("/halottolo.glb") as GLTFResult;
 	const groupRef = useRef<THREE.Group>(null);
 
-	// Create a shared material with merged options
 	const material = useMemo(() => {
 		const mergedMaterialOptions = {
 			...defaultMaterialOptions,
@@ -71,7 +70,6 @@ export function Halottolo({
 		});
 	}, [materialOptions]);
 
-	// Add rotation animation
 	useFrame((state, delta) => {
 		if (groupRef.current && rotationOptions.axis !== "none") {
 			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
