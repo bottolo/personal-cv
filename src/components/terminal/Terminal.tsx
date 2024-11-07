@@ -1,7 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { NoiseEffect } from "../../global-utils/NoiseEffect.tsx";
-import { HOLOGRAM_COLORS } from "../../global-utils/colors.ts";
+import {
+	HOLOGRAM_COLORS,
+	hologramAnimations,
+} from "../../global-utils/colors.ts";
 import { useDialogueStore } from "../../store/dialogue-store.ts";
 import { GlitchContainer } from "./utils/glitch-container.tsx";
 import { GlitchText } from "./utils/glitch-text.tsx";
@@ -16,7 +19,6 @@ const Terminal = () => {
 	const [isGlitching, setIsGlitching] = useState(false);
 	const terminalRef = useRef<HTMLDivElement>(null);
 
-	// Word cycling effect
 	useEffect(() => {
 		const intervalId = setInterval(() => {
 			setIsGlitching(true);
@@ -33,7 +35,6 @@ const Terminal = () => {
 		return () => clearInterval(intervalId);
 	}, []);
 
-	// Cursor blinking effect
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setShowCursor((prev) => !prev);
@@ -41,7 +42,6 @@ const Terminal = () => {
 		return () => clearInterval(interval);
 	}, []);
 
-	// Typing effect
 	useEffect(() => {
 		if (!currentDialogue?.dialogue[currentPage]) return;
 
@@ -63,7 +63,6 @@ const Terminal = () => {
 		return () => clearInterval(typeInterval);
 	}, [currentDialogue, currentPage]);
 
-	// Key press handling
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
 			if (e.key === "Enter" && !isTyping && currentDialogue) {
@@ -75,7 +74,6 @@ const Terminal = () => {
 		return () => window.removeEventListener("keypress", handleKeyPress);
 	}, [isTyping, currentDialogue, nextPage]);
 
-	// Auto-scroll
 	useEffect(() => {
 		if (terminalRef.current) {
 			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -88,34 +86,48 @@ const Terminal = () => {
 				<motion.div className="w-full h-full z-[1000]">
 					<GlitchContainer>
 						<div
-							className="relative bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm border"
-							style={{ borderColor: HOLOGRAM_COLORS.border.normal }}
+							className="relative backdrop-blur-sm border overflow-hidden"
+							style={{
+								borderColor: HOLOGRAM_COLORS.border.normal,
+								background: `linear-gradient(135deg, 
+                                     ${HOLOGRAM_COLORS.bg.gradient.from}, 
+                                     ${HOLOGRAM_COLORS.bg.gradient.to}
+                                 )`,
+							}}
 						>
+							{/* Background Effects */}
 							<motion.div
-								animate={{
-									boxShadow: [
-										HOLOGRAM_COLORS.glow.weak,
-										HOLOGRAM_COLORS.glow.medium,
-										HOLOGRAM_COLORS.glow.weak,
-									],
+								className="absolute inset-0 pointer-events-none"
+								style={{
+									backgroundImage: `
+                                        linear-gradient(to right,
+                                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                                            transparent 1px
+                                        ),
+                                        linear-gradient(to bottom,
+                                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                                            transparent 1px
+                                        )
+                                    `,
+									backgroundSize: "20px 20px",
+									opacity: 0.1,
 								}}
-								transition={{
-									duration: 2,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-								}}
+							/>
+
+							<motion.div
+								animate={hologramAnimations.glow}
 								className="absolute inset-[-1px] border backdrop-blur-lg -z-10"
 								style={{
 									borderColor: HOLOGRAM_COLORS.border.normal,
 									backgroundColor: HOLOGRAM_COLORS.bg.surface,
 								}}
 							>
-								<NoiseEffect opacity={0.02} />
+								<NoiseEffect opacity={0.01} />
 							</motion.div>
 
 							<div
 								ref={terminalRef}
-								className="p-4 h-48 overflow-y-auto font-mono custom-scrollbar"
+								className="p-4 h-48 overflow-y-auto font-mono custom-scrollbar relative"
 								style={{ color: HOLOGRAM_COLORS.text.secondary }}
 							>
 								<div className="mb-2 flex items-center gap-2">
@@ -126,6 +138,11 @@ const Terminal = () => {
 													HOLOGRAM_COLORS.text.primary,
 													HOLOGRAM_COLORS.text.secondary,
 													HOLOGRAM_COLORS.text.primary,
+												],
+												textShadow: [
+													HOLOGRAM_COLORS.glow.weak,
+													HOLOGRAM_COLORS.glow.medium,
+													HOLOGRAM_COLORS.glow.weak,
 												],
 											}}
 											transition={{
@@ -143,6 +160,11 @@ const Terminal = () => {
 													HOLOGRAM_COLORS.text.primary,
 													HOLOGRAM_COLORS.text.secondary,
 													HOLOGRAM_COLORS.text.primary,
+												],
+												textShadow: [
+													HOLOGRAM_COLORS.glow.weak,
+													HOLOGRAM_COLORS.glow.medium,
+													HOLOGRAM_COLORS.glow.weak,
 												],
 											}}
 											transition={{
@@ -169,11 +191,7 @@ const Terminal = () => {
 												HOLOGRAM_COLORS.glow.weak,
 											],
 										}}
-										transition={{
-											duration: 2,
-											repeat: Number.POSITIVE_INFINITY,
-											ease: "easeInOut",
-										}}
+										transition={hologramAnimations.glow.transition}
 									>
 										{displayText}
 									</motion.span>
@@ -192,11 +210,7 @@ const Terminal = () => {
 													duration: 0.5,
 													repeat: Number.POSITIVE_INFINITY,
 												},
-												boxShadow: {
-													duration: 2,
-													repeat: Number.POSITIVE_INFINITY,
-													ease: "easeInOut",
-												},
+												boxShadow: hologramAnimations.glow.transition,
 											}}
 											className="absolute ml-1"
 											style={{ color: HOLOGRAM_COLORS.text.primary }}
@@ -209,15 +223,8 @@ const Terminal = () => {
 								{!isTyping && (
 									<motion.div
 										initial={{ opacity: 0 }}
-										animate={{
-											opacity: [0.4, 0.8, 0.4],
-										}}
-										transition={{
-											duration: 2,
-											repeat: Number.POSITIVE_INFINITY,
-											ease: "easeInOut",
-										}}
-										className="text-sm mt-2 italic"
+										animate={hologramAnimations.pulse.animate}
+										className="text-sm mt-2"
 										style={{ color: HOLOGRAM_COLORS.text.muted }}
 									>
 										Press Enter to continue...
@@ -247,11 +254,7 @@ const Terminal = () => {
 												HOLOGRAM_COLORS.glow.weak,
 											],
 										}}
-										transition={{
-											duration: 2,
-											repeat: Number.POSITIVE_INFINITY,
-											ease: "easeInOut",
-										}}
+										transition={hologramAnimations.glow.transition}
 									>
 										{currentWord}
 									</motion.span>

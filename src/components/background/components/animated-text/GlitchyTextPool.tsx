@@ -3,24 +3,21 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NoiseEffect } from "../../../../global-utils/NoiseEffect.tsx";
 import { cn } from "../../../../global-utils/cn.ts";
+import {
+	HOLOGRAM_COLORS,
+	hologramAnimations,
+} from "../../../../global-utils/colors.ts";
+import type { Position } from "../../../../global-utils/position.ts";
 
-// Depth type
+// Types and Interfaces
 type Depth = "near" | "mid" | "far";
 
-// Position type
-interface Position {
-	readonly x: number;
-	readonly y: number;
-}
-
-// Text configuration type
 interface TextConfig {
 	readonly text: string;
 	readonly depth: Depth;
 	readonly position: Position;
 }
 
-// Visual style configuration
 interface VisualConfig {
 	readonly baseColor: string;
 	readonly glowColor: string;
@@ -28,7 +25,6 @@ interface VisualConfig {
 	readonly noiseOpacity: number;
 }
 
-// Animation configuration
 interface AnimationConfig {
 	readonly spawnInterval: number;
 	readonly textLifespan: number;
@@ -36,7 +32,6 @@ interface AnimationConfig {
 	readonly glitchIntensity: number;
 }
 
-// Complete props interface
 interface TextPoolProps
 	extends Partial<VisualConfig>,
 		Partial<AnimationConfig> {
@@ -44,7 +39,6 @@ interface TextPoolProps
 	readonly maxActiveTexts?: number;
 }
 
-// Depth-specific styles
 interface DepthStyles {
 	readonly blur: string;
 	readonly opacity: number;
@@ -53,7 +47,6 @@ interface DepthStyles {
 	readonly fontSize: string;
 }
 
-// Glitch text component props
 interface GlitchTextProps {
 	readonly config: TextConfig;
 	readonly style: React.CSSProperties;
@@ -63,13 +56,12 @@ interface GlitchTextProps {
 	readonly blur: string;
 }
 
-// Active text type
 type ActiveText = TextConfig & { readonly id: number };
 
-// Default configurations
+// Default Configurations
 const DEFAULT_VISUAL_CONFIG: Required<VisualConfig> = {
-	baseColor: "#8c75e1",
-	glowColor: "#8c75e1",
+	baseColor: HOLOGRAM_COLORS.text.primary,
+	glowColor: HOLOGRAM_COLORS.primary,
 	bloomIntensity: 0.4,
 	noiseOpacity: 0.1,
 } as const;
@@ -123,6 +115,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
 			const glitchIndex = Math.floor(Math.random() * displayText.length);
 			const glitchChar =
 				glitchCharacters[Math.floor(Math.random() * glitchCharacters.length)];
+
 			setGlitchText(
 				displayText.slice(0, glitchIndex) +
 					glitchChar +
@@ -159,9 +152,20 @@ const GlitchText: React.FC<GlitchTextProps> = ({
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
+			animate={{
+				opacity: 1,
+				y: 0,
+				textShadow: [
+					HOLOGRAM_COLORS.glow.weak,
+					HOLOGRAM_COLORS.glow.medium,
+					HOLOGRAM_COLORS.glow.weak,
+				],
+			}}
 			exit={{ opacity: 0, y: -20 }}
-			transition={{ duration: 0.5 }}
+			transition={{
+				duration: 0.5,
+				textShadow: hologramAnimations.glow.transition,
+			}}
 			style={{
 				...style,
 				left: position.x,
@@ -175,6 +179,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
 	);
 };
 
+// Main GlitchyTextPool Component
 export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 	textPool,
 	maxActiveTexts = 100,
@@ -183,7 +188,6 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 	const [activeTexts, setActiveTexts] = useState<readonly ActiveText[]>([]);
 	const nextIdRef = useRef(0);
 
-	// Merge default and provided configurations
 	const config = {
 		...DEFAULT_VISUAL_CONFIG,
 		...DEFAULT_ANIMATION_CONFIG,
@@ -235,7 +239,6 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 		const id = nextIdRef.current++;
 
 		setActiveTexts((prev) => [...prev, { id, text, depth, position }]);
-
 		setTimeout(() => removeText(id), config.textLifespan);
 	}, [
 		textPool,
@@ -255,6 +258,23 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 			<AnimatePresence mode="popLayout">
 				{activeTexts.map(({ id, text, depth, position }) => {
 					const depthStyle = depthStyles[depth];
+					let baseColor = HOLOGRAM_COLORS.text.primary;
+					let glowEffect = HOLOGRAM_COLORS.glow.weak;
+
+					switch (depth) {
+						case "near":
+							baseColor = HOLOGRAM_COLORS.text.primary;
+							glowEffect = HOLOGRAM_COLORS.glow.strong;
+							break;
+						case "mid":
+							baseColor = HOLOGRAM_COLORS.text.secondary;
+							glowEffect = HOLOGRAM_COLORS.glow.medium;
+							break;
+						case "far":
+							baseColor = HOLOGRAM_COLORS.text.muted;
+							glowEffect = HOLOGRAM_COLORS.glow.weak;
+							break;
+					}
 
 					return (
 						<GlitchText
@@ -267,17 +287,50 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 							style={{
 								position: "absolute",
 								fontFamily: "monospace",
-								color: config.baseColor,
+								color: baseColor,
 								opacity: depthStyle.opacity,
 								transform: `scale(${depthStyle.scale})`,
 								zIndex: depthStyle.zIndex,
 								fontSize: depthStyle.fontSize,
-								textShadow: `0 0 ${config.bloomIntensity * 10}px ${config.glowColor}`,
+								textShadow: glowEffect,
+								background: `linear-gradient(135deg,
+                                    ${HOLOGRAM_COLORS.effects.glitch.overlay},
+                                    transparent)`,
+								backgroundClip: "text",
+								WebkitBackgroundClip: "text",
 							}}
 						/>
 					);
 				})}
 			</AnimatePresence>
+
+			{/* Grid Overlay */}
+			<div
+				className="absolute inset-0 pointer-events-none"
+				style={{
+					backgroundImage: `
+                        linear-gradient(to right, ${HOLOGRAM_COLORS.grid.line} 1px, transparent 1px),
+                        linear-gradient(to bottom, ${HOLOGRAM_COLORS.grid.line} 1px, transparent 1px)
+                    `,
+					backgroundSize: "20px 20px",
+					opacity: 0.2,
+				}}
+			/>
+
+			{/* Scan Line Effect */}
+			<motion.div
+				className="absolute left-0 right-0 pointer-events-none"
+				style={{
+					background: `linear-gradient(to bottom,
+                        transparent,
+                        ${HOLOGRAM_COLORS.effects.scanLine},
+                        transparent
+                    )`,
+					height: "2px",
+				}}
+				animate={hologramAnimations.scan.animate}
+				transition={hologramAnimations.scan.transition}
+			/>
 		</div>
 	);
 };

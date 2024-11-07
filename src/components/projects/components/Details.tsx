@@ -1,8 +1,155 @@
-import { motion } from "framer-motion";
-import { memo } from "react";
+import { motion, useAnimationControls } from "framer-motion";
+import { memo, useEffect, useMemo, useState } from "react";
 import { NoiseEffect } from "../../../global-utils/NoiseEffect.tsx";
-import { HOLOGRAM_COLORS } from "../../../global-utils/colors.ts";
+import {
+	HOLOGRAM_COLORS,
+	hologramAnimations,
+} from "../../../global-utils/colors.ts";
 import type { Project } from "../utils/projects.ts";
+
+const ANIMATION_SEQUENCE = {
+	title: 0,
+	description: 400,
+	techTitle: 800,
+	techItems: 1000,
+	links: 1200,
+	images: 1400,
+} as const;
+
+const TypewriterText = memo(
+	({ text, delay = 0 }: { text: string; delay?: number }) => {
+		const [displayText, setDisplayText] = useState("");
+
+		useEffect(() => {
+			let index = 0;
+			let intervalId: NodeJS.Timeout;
+			const timerId = setTimeout(() => {
+				intervalId = setInterval(() => {
+					if (index < text.length) {
+						setDisplayText((prev) => text.slice(0, prev.length + 1));
+						index++;
+					} else {
+						clearInterval(intervalId);
+					}
+				}, 30);
+			}, delay);
+
+			return () => {
+				clearTimeout(timerId);
+				clearInterval(intervalId);
+			};
+		}, [text, delay]);
+
+		return <span>{displayText}</span>;
+	},
+);
+
+const MarbleButton = memo(
+	({
+		children,
+		onClick,
+		className = "",
+		isClose = false,
+	}: {
+		children: React.ReactNode;
+		onClick: () => void;
+		className?: string;
+		isClose?: boolean;
+	}) => {
+		const buttonStyle = useMemo(
+			() => ({
+				background: `linear-gradient(135deg, ${HOLOGRAM_COLORS.sphere.gradient.start}, ${HOLOGRAM_COLORS.sphere.gradient.end})`,
+				boxShadow: `0 5px 15px ${HOLOGRAM_COLORS.sphere.glow.outer},
+                    inset -2px -2px 6px ${HOLOGRAM_COLORS.sphere.glow.inner},
+                    inset 2px 2px 6px ${HOLOGRAM_COLORS.sphere.highlight}`,
+			}),
+			[],
+		);
+
+		const hoverAnimation = useMemo(
+			() => ({
+				scale: 1.05,
+				boxShadow: `0 10px 30px ${HOLOGRAM_COLORS.sphere.glow.outer},
+                    inset -2px -2px 10px ${HOLOGRAM_COLORS.sphere.glow.inner},
+                    inset 2px 2px 10px ${HOLOGRAM_COLORS.sphere.highlight}`,
+			}),
+			[],
+		);
+
+		return (
+			<motion.button
+				onClick={onClick}
+				className={`relative rounded-none flex items-center justify-center cursor-none font-mono ${className}`}
+				style={buttonStyle}
+				whileHover={hoverAnimation}
+				animate={
+					isClose
+						? {
+								background: [
+									`linear-gradient(135deg, ${HOLOGRAM_COLORS.sphere.gradient.start}, ${HOLOGRAM_COLORS.sphere.gradient.end})`,
+									"linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 0.5))",
+								],
+							}
+						: undefined
+				}
+				transition={{ duration: 0.2 }}
+			>
+				{children}
+			</motion.button>
+		);
+	},
+);
+
+const ProjectImage = memo(
+	({
+		image,
+		index,
+		baseDelay,
+	}: {
+		image: Project["images"][0];
+		index: number;
+		baseDelay: number;
+	}) => (
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ delay: baseDelay / 1000 + index * 0.15 }}
+			className="space-y-2"
+		>
+			<motion.div
+				className="relative aspect-video rounded-lg overflow-hidden"
+				style={{
+					backgroundColor: HOLOGRAM_COLORS.bg.surface,
+					borderColor: HOLOGRAM_COLORS.border.normal,
+				}}
+				animate={hologramAnimations.glow.animate}
+				transition={hologramAnimations.glow.transition}
+			>
+				<img
+					src={image.src}
+					alt={image.alt}
+					className="w-full h-full object-cover"
+					style={{
+						filter: "brightness(1.1) contrast(1.05)",
+						mixBlendMode: "screen",
+					}}
+					loading="lazy"
+				/>
+			</motion.div>
+			{image.description && (
+				<p
+					className="text-sm font-mono"
+					style={{ color: HOLOGRAM_COLORS.text.muted }}
+				>
+					<TypewriterText
+						text={image.description}
+						delay={baseDelay + index * 150}
+					/>
+				</p>
+			)}
+		</motion.div>
+	),
+);
 
 interface DetailsProps {
 	project: Project;
@@ -10,6 +157,12 @@ interface DetailsProps {
 }
 
 const Details = memo(({ project, onClose }: DetailsProps) => {
+	const controls = useAnimationControls();
+
+	useEffect(() => {
+		controls.start({ opacity: 1 });
+	}, [controls]);
+
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
@@ -18,38 +171,8 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 			className="absolute inset-0 flex items-center justify-center"
 			style={{ zIndex: 50 }}
 		>
-			{/* Main Container */}
+			{/* Container remains the same */}
 			<div className="relative w-full h-full bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm border border-blue-400/20 overflow-hidden">
-				{/* Hologram Effects Container */}
-				<div className="absolute inset-0 pointer-events-none">
-					{/* Scanning line effect */}
-					<motion.div
-						className="absolute w-full h-1 blur-sm"
-						style={{ backgroundColor: `${HOLOGRAM_COLORS.primary}40` }}
-						animate={{
-							top: ["-10%", "110%"],
-						}}
-						transition={{
-							duration: 2.5,
-							repeat: Number.POSITIVE_INFINITY,
-							ease: "linear",
-						}}
-					/>
-
-					{/* Grid pattern */}
-					<div
-						className="absolute inset-0 opacity-10"
-						style={{
-							backgroundImage: `
-                linear-gradient(0deg, transparent 24%, ${HOLOGRAM_COLORS.accent}30 25%, ${HOLOGRAM_COLORS.accent}30 26%, transparent 27%, transparent 74%, ${HOLOGRAM_COLORS.accent}30 75%, ${HOLOGRAM_COLORS.accent}30 76%, transparent 77%, transparent),
-                linear-gradient(90deg, transparent 24%, ${HOLOGRAM_COLORS.accent}30 25%, ${HOLOGRAM_COLORS.accent}30 26%, transparent 27%, transparent 74%, ${HOLOGRAM_COLORS.accent}30 75%, ${HOLOGRAM_COLORS.accent}30 76%, transparent 77%, transparent)
-              `,
-							backgroundSize: "50px 50px",
-						}}
-					/>
-				</div>
-
-				{/* Content Container */}
 				<div className="relative flex h-full">
 					{/* Left side - Info */}
 					<motion.div
@@ -61,95 +184,94 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 						<div className="h-full overflow-y-auto p-8 custom-scrollbar">
 							<div className="space-y-6">
 								<motion.h2
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
 									className="text-3xl font-mono font-bold"
 									style={{ color: HOLOGRAM_COLORS.text.primary }}
-									animate={{
-										opacity: [0.7, 1, 0.7],
-										textShadow: [
-											HOLOGRAM_COLORS.glow.weak,
-											HOLOGRAM_COLORS.glow.medium,
-											HOLOGRAM_COLORS.glow.weak,
-										],
-									}}
-									transition={{
-										duration: 2,
-										repeat: Number.POSITIVE_INFINITY,
-										ease: "easeInOut",
-									}}
 								>
-									{project.title}
+									<TypewriterText
+										text={project.title}
+										delay={ANIMATION_SEQUENCE.title}
+									/>
 								</motion.h2>
 
 								<motion.p
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ delay: ANIMATION_SEQUENCE.description / 1000 }}
 									className="text-lg leading-relaxed font-mono"
 									style={{
 										color: HOLOGRAM_COLORS.text.secondary,
 										textShadow: HOLOGRAM_COLORS.glow.weak,
 									}}
 								>
-									{project.description}
+									<TypewriterText
+										text={project.description}
+										delay={ANIMATION_SEQUENCE.description}
+									/>
 								</motion.p>
 
-								<div className="space-y-2">
+								<motion.div
+									className="space-y-2"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ delay: ANIMATION_SEQUENCE.techTitle / 1000 }}
+								>
 									<h3
 										className="font-mono"
 										style={{ color: HOLOGRAM_COLORS.text.primary }}
 									>
-										Technologies
+										<TypewriterText
+											text="Technologies"
+											delay={ANIMATION_SEQUENCE.techTitle}
+										/>
 									</h3>
 									<div className="flex flex-wrap gap-2">
-										{project.technologies.map((tech) => (
-											<motion.span
+										{project.technologies.map((tech, index) => (
+											<motion.div
 												key={tech}
-												className="px-3 py-1 rounded font-mono text-sm"
-												style={{
-													backgroundColor: HOLOGRAM_COLORS.bg.surface,
-													borderColor: HOLOGRAM_COLORS.border.normal,
-													color: HOLOGRAM_COLORS.text.primary,
-												}}
-												animate={{
-													boxShadow: [
-														HOLOGRAM_COLORS.glow.weak,
-														HOLOGRAM_COLORS.glow.medium,
-														HOLOGRAM_COLORS.glow.weak,
-													],
-												}}
+												initial={{ opacity: 0, scale: 0.8 }}
+												animate={{ opacity: 1, scale: 1 }}
 												transition={{
-													duration: 2,
-													repeat: Number.POSITIVE_INFINITY,
-													ease: "easeInOut",
-													delay: Math.random(),
+													delay:
+														ANIMATION_SEQUENCE.techItems / 1000 + index * 0.1,
 												}}
 											>
-												{tech}
-											</motion.span>
+												<MarbleButton
+													onClick={() => {}}
+													className="px-3 py-1 text-sm"
+												>
+													<TypewriterText
+														text={tech}
+														delay={ANIMATION_SEQUENCE.techItems + index * 100}
+													/>
+												</MarbleButton>
+											</motion.div>
 										))}
 									</div>
-								</div>
+								</motion.div>
 
 								{project.links && (
-									<div className="flex gap-4">
+									<motion.div
+										className="flex gap-4"
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										transition={{ delay: ANIMATION_SEQUENCE.links / 1000 }}
+									>
 										{project.links.github && (
-											<motion.a
-												href={project.links.github}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="inline-flex items-center px-4 py-2 rounded font-mono text-sm"
-												style={{
-													backgroundColor: HOLOGRAM_COLORS.bg.surface,
-													borderColor: HOLOGRAM_COLORS.border.normal,
-													color: HOLOGRAM_COLORS.text.primary,
-												}}
-												whileHover={{
-													backgroundColor: HOLOGRAM_COLORS.bg.hover,
-													boxShadow: HOLOGRAM_COLORS.glow.medium,
-												}}
+											<MarbleButton
+												onClick={() =>
+													window.open(project?.links.github, "_blank")
+												}
+												className="px-4 py-2 text-sm"
 											>
-												GitHub →
-											</motion.a>
+												<TypewriterText
+													text="GitHub →"
+													delay={ANIMATION_SEQUENCE.links}
+												/>
+											</MarbleButton>
 										)}
-										{/* Similar styling for demo link */}
-									</div>
+									</motion.div>
 								)}
 							</div>
 						</div>
@@ -159,109 +281,40 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 					<div className="w-3/5 h-full overflow-y-auto p-8 custom-scrollbar">
 						<div className="space-y-8">
 							{project.images.map((image, index) => (
-								<motion.div
+								<ProjectImage
 									key={index}
-									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{ delay: 0.2 + index * 0.1 }}
-									className="space-y-2"
-								>
-									<motion.div
-										className="relative aspect-video rounded-lg overflow-hidden"
-										style={{
-											backgroundColor: HOLOGRAM_COLORS.bg.surface,
-											borderColor: HOLOGRAM_COLORS.border.normal,
-										}}
-										animate={{
-											boxShadow: [
-												HOLOGRAM_COLORS.glow.weak,
-												HOLOGRAM_COLORS.glow.medium,
-												HOLOGRAM_COLORS.glow.weak,
-											],
-										}}
-										transition={{
-											duration: 2,
-											repeat: Number.POSITIVE_INFINITY,
-											ease: "easeInOut",
-											delay: index * 0.2,
-										}}
-									>
-										<img
-											src={image.src}
-											alt={image.alt}
-											className="w-full h-full object-cover"
-											style={{
-												filter: "brightness(1.1) contrast(1.05)",
-												mixBlendMode: "screen",
-											}}
-										/>
-									</motion.div>
-									{image.description && (
-										<p
-											className="text-sm font-mono"
-											style={{ color: HOLOGRAM_COLORS.text.muted }}
-										>
-											{image.description}
-										</p>
-									)}
-								</motion.div>
+									image={image}
+									index={index}
+									baseDelay={ANIMATION_SEQUENCE.images}
+								/>
 							))}
 						</div>
 					</div>
 
-					<div className="absolute top-2 right-2 text-[0.5rem] font-mono text-blue-300/60">
-						project.details | v1.0
-					</div>
+					{/* Close button and version text */}
+					<motion.div
+						className="absolute top-2 right-2 text-[0.6rem] font-mono text-blue-300/60"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.2 }}
+					>
+						<TypewriterText text={`project[${project.id}].details`} />
+					</motion.div>
 
-					{/* Close button */}
-					<div className="absolute top-2 right-2 flex items-center gap-2">
-						<motion.button
+					<motion.div
+						className="absolute bottom-2 right-2 flex items-center gap-2"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.2 }}
+					>
+						<MarbleButton
 							onClick={onClose}
-							className="relative group p-2 rounded-none"
-							style={{
-								backgroundColor: HOLOGRAM_COLORS.bg.surface,
-								borderColor: HOLOGRAM_COLORS.border.normal,
-							}}
-							whileHover={{
-								backgroundColor: "rgba(239, 68, 68, 0.2)",
-							}}
+							className="w-16 h-8 text-sm"
+							isClose={true}
 						>
-							<motion.div
-								className="absolute inset-0 rounded"
-								animate={{
-									boxShadow: [
-										HOLOGRAM_COLORS.glow.weak,
-										HOLOGRAM_COLORS.glow.medium,
-										HOLOGRAM_COLORS.glow.weak,
-									],
-								}}
-								transition={{
-									duration: 2,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-								}}
-							/>
-							<svg
-								alt={"Close Icon"}
-								xmlns="http://www.w3.org/2000/svg"
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								className="relative z-10 transition-colors"
-								style={{
-									color: HOLOGRAM_COLORS.text.muted,
-								}}
-							>
-								<line x1="18" y1="6" x2="6" y2="18" />
-								<line x1="6" y1="6" x2="18" y2="18" />
-							</svg>
-						</motion.button>
-					</div>
+							Close
+						</MarbleButton>
+					</motion.div>
 				</div>
 			</div>
 			<NoiseEffect opacity={0.02} />

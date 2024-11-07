@@ -2,7 +2,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { NoiseEffect } from "../../../global-utils/NoiseEffect.tsx";
 import { cn } from "../../../global-utils/cn.ts";
-import { HOLOGRAM_COLORS } from "../../../global-utils/colors.ts";
+import {
+	HOLOGRAM_COLORS,
+	hologramAnimations,
+} from "../../../global-utils/colors.ts";
 import type { Position } from "../../../global-utils/position.ts";
 import { PROJECTS, type Project } from "../utils/projects.ts";
 import Details from "./Details.tsx";
@@ -97,6 +100,20 @@ const Sphere = memo(
 				onHoverEnd={onHoverEnd}
 				style={sphereStyle}
 			>
+				{/* Glow effect */}
+				<motion.div
+					className="absolute inset-0 rounded-full pointer-events-none"
+					style={{
+						background: `radial-gradient(circle at center,
+                        ${HOLOGRAM_COLORS.glow.weak},
+                        transparent 70%
+                    )`,
+						opacity: isHovered ? 0.8 : 0.4,
+					}}
+					animate={hologramAnimations.glow.animate}
+					transition={hologramAnimations.glow.transition}
+				/>
+
 				<motion.div
 					className={staticStyles.sphereContent}
 					initial={{ opacity: 0 }}
@@ -105,18 +122,35 @@ const Sphere = memo(
 				>
 					<motion.span
 						className={staticStyles.sphereText}
-						style={{ color: HOLOGRAM_COLORS.text.primary }}
+						style={{
+							color: HOLOGRAM_COLORS.text.primary,
+							textShadow: `0 0 10px ${HOLOGRAM_COLORS.glow.medium}`,
+						}}
 						initial={{ opacity: 0, scale: 0.8 }}
 						animate={{
 							opacity: isHovered ? 1 : 0,
 							scale: isHovered ? 1 : 0.8,
-							textShadow: HOLOGRAM_COLORS.glow.medium,
 						}}
 						transition={{ duration: 0.2, delay: 0.15 }}
 					>
 						{project.title}
 					</motion.span>
 				</motion.div>
+
+				{/* Particle effect for hover state */}
+				{isHovered && (
+					<motion.div
+						className="absolute inset-0 pointer-events-none"
+						style={{
+							background: `radial-gradient(circle at 50% 50%,
+                            ${HOLOGRAM_COLORS.effects.particles},
+                            transparent 70%
+                        )`,
+						}}
+						animate={hologramAnimations.pulse.animate}
+						transition={hologramAnimations.pulse.transition}
+					/>
+				)}
 			</motion.div>
 		);
 	},
@@ -169,12 +203,8 @@ const Projects = () => {
 		return (
 			<div className={staticStyles.loadingContainer}>
 				<motion.div
-					animate={{ opacity: [0.3, 0.6, 0.3] }}
-					transition={{
-						duration: 1.5,
-						repeat: Number.POSITIVE_INFINITY,
-						ease: "easeInOut",
-					}}
+					animate={hologramAnimations.pulse.animate}
+					transition={hologramAnimations.pulse.transition}
 					style={{ color: HOLOGRAM_COLORS.text.secondary }}
 					className={staticStyles.loadingText}
 				>
@@ -186,8 +216,34 @@ const Projects = () => {
 
 	return (
 		<div className={cn(staticStyles.container)}>
+			<p
+				className={
+					"absolute right-2 top-2 font-mono text-[0.6rem] opacity-30 bg-transparent"
+				}
+			>
+				projects.amount = {PROJECTS.length}
+			</p>
 			<Radar />
-			<NoiseEffect opacity={0.01} />
+			<NoiseEffect opacity={0.02} />
+
+			{/* Grid background */}
+			<div
+				className="absolute inset-0 pointer-events-none"
+				style={{
+					backgroundImage: `
+                        linear-gradient(to right,
+                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                            transparent 1px
+                        ),
+                        linear-gradient(to bottom,
+                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                            transparent 1px
+                        )
+                    `,
+					backgroundSize: "20px 20px",
+					opacity: 0.3,
+				}}
+			/>
 
 			<AnimatePresence>
 				{!selectedProject &&

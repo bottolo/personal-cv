@@ -1,5 +1,5 @@
 import { Environment } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import {
 	Bloom,
 	ChromaticAberration,
@@ -8,9 +8,10 @@ import {
 	Scanline,
 } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize, Resolution } from "postprocessing";
-import { Suspense, memo, useEffect, useMemo, useRef } from "react";
+import { Suspense, memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { cn } from "../../../../global-utils/cn.ts";
+import { HOLOGRAM_COLORS } from "../../../../global-utils/colors.ts";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { Cube } from "../../../3d-models/Cube.tsx";
 import { Dodecahedron } from "../../../3d-models/Dodecahedron.tsx";
@@ -26,8 +27,8 @@ const commonMaterialOptions = {
 const wireframeMaterial = {
 	...commonMaterialOptions,
 	color: "#ffffff",
-	wireframe: true,
-	opacity: 0.8,
+	wireframe: false,
+	opacity: 0.4,
 };
 
 const solidMaterial = {
@@ -37,7 +38,6 @@ const solidMaterial = {
 	opacity: 1,
 };
 
-// Scene component to enable React.memo
 const Scene = memo(() => {
 	const sphereGeometry = useMemo(() => new THREE.SphereGeometry(1, 32, 32), []);
 	const cubeGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
@@ -55,7 +55,7 @@ const Scene = memo(() => {
 						speed: 0.1,
 					}}
 					rotation={[1.9, 1.25, -0.5]}
-					position={[-3.5, 1, 3]}
+					position={[-3.5, 1, 5]}
 				/>
 			</Suspense>
 
@@ -79,7 +79,7 @@ const Scene = memo(() => {
 					position={[50, 30, -30]}
 					materialOptions={{
 						...wireframeMaterial,
-						opacity: 1,
+						opacity: 0.5,
 						emissiveIntensity: 1,
 					}}
 					scale={60}
@@ -127,13 +127,14 @@ const Scene = memo(() => {
 
 const CAMERA_POSITIONS = {
 	firstChoice: {
-		position: new THREE.Vector3(8, 20, 0),
-		target: new THREE.Vector3(-3.5, 1, 3),
-	},
-	secondChoice: {
 		position: new THREE.Vector3(-5, 0, 8),
 		target: new THREE.Vector3(-5, 1, 7),
 	},
+	secondChoice: {
+		position: new THREE.Vector3(8, 20, 0),
+		target: new THREE.Vector3(-3.5, 1, 3),
+	},
+
 	thirdChoice: {
 		position: new THREE.Vector3(15, 15, -30),
 		target: new THREE.Vector3(-10, -20, 15),
@@ -148,41 +149,68 @@ const CAMERA_POSITIONS = {
 const CameraController = () => {
 	const { camera } = useThree();
 	const { currentDialogue } = useDialogueStore();
-	const targetPosition = useRef(CAMERA_POSITIONS.default.position.clone());
-	const targetLookAt = useRef(CAMERA_POSITIONS.default.target.clone());
+	const [isTransitioning, setIsTransitioning] = useState(false);
+	const previousDialogue = useRef(currentDialogue);
+	const interferenceRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
-		if (currentDialogue) {
+		if (!interferenceRef.current) {
+			const overlay = document.createElement("div");
+			overlay.style.position = "fixed";
+			overlay.style.inset = "0";
+			overlay.style.background = "white";
+			overlay.style.opacity = "0";
+			overlay.style.pointerEvents = "none";
+			overlay.style.zIndex = "1000";
+			overlay.style.transition = "opacity 0.1s ease";
+			document.body.appendChild(overlay);
+			interferenceRef.current = overlay;
+		}
+
+		if (currentDialogue?.id !== previousDialogue.current?.id) {
+			setIsTransitioning(true);
+
+			if (interferenceRef.current) {
+				interferenceRef.current.style.opacity = "0.8";
+
+				interferenceRef.current.style.backgroundImage = `
+                    repeating-linear-gradient(
+                        0deg,
+                        ${HOLOGRAM_COLORS.effects.scanLine} 0px,
+                        ${HOLOGRAM_COLORS.effects.scanLine} 1px,
+                        transparent 2px,
+                        transparent 4px
+                    )
+                `;
+			}
+
 			const cameraConfig =
-				CAMERA_POSITIONS[currentDialogue.id] ||
+				CAMERA_POSITIONS[currentDialogue?.id] ||
 				Object.entries(CAMERA_POSITIONS).find(
-					([key]) => key === currentDialogue.name,
+					([key]) => key === currentDialogue?.name,
 				)?.[1] ||
 				CAMERA_POSITIONS.default;
 
-			targetPosition.current.copy(cameraConfig.position);
-			targetLookAt.current.copy(cameraConfig.target);
-		} else {
-			targetPosition.current.copy(CAMERA_POSITIONS.default.position);
-			targetLookAt.current.copy(CAMERA_POSITIONS.default.target);
+			camera.position.copy(cameraConfig.position);
+			camera.lookAt(cameraConfig.target);
+
+			setTimeout(() => {
+				if (interferenceRef.current) {
+					interferenceRef.current.style.opacity = "0";
+				}
+				setIsTransitioning(false);
+			}, 150);
+
+			previousDialogue.current = currentDialogue;
 		}
-	}, [currentDialogue]);
 
-	useFrame(() => {
-		// Smooth camera position movement
-		camera.position.lerp(targetPosition.current, 0.02);
-
-		// Smooth camera look-at movement
-		const currentLookAt = new THREE.Vector3();
-		camera.getWorldDirection(currentLookAt);
-		const targetDirection = targetLookAt.current
-			.clone()
-			.sub(camera.position)
-			.normalize();
-
-		const newDirection = currentLookAt.lerp(targetDirection, 0.02);
-		camera.lookAt(camera.position.clone().add(newDirection));
-	});
+		return () => {
+			if (interferenceRef.current) {
+				document.body.removeChild(interferenceRef.current);
+				interferenceRef.current = null;
+			}
+		};
+	}, [camera, currentDialogue]);
 
 	return null;
 };
@@ -192,6 +220,15 @@ interface AnimatedRingsProps {
 }
 
 export const AnimatedRings = ({ className }: AnimatedRingsProps) => {
+	const [glitchActive, setGlitchActive] = useState(false);
+	const { currentDialogue } = useDialogueStore();
+
+	useEffect(() => {
+		setGlitchActive(true);
+		const timer = setTimeout(() => setGlitchActive(false), 200);
+		return () => clearTimeout(timer);
+	}, [currentDialogue]);
+
 	return (
 		<div
 			className={cn(className, "fixed inset-0 overflow-hidden blur-[0.1rem]")}
@@ -199,34 +236,35 @@ export const AnimatedRings = ({ className }: AnimatedRingsProps) => {
 			<Canvas
 				shadows
 				camera={{ position: [-5, 2, 10.5], fov: 120 }}
-				dpr={[1, 2]} // Limit pixel ratio
-				performance={{ min: 0 }} // Enable automatic performance optimization
+				dpr={[1, 2]}
+				performance={{ min: 0 }}
 			>
 				<color attach="background" args={["#371d95"]} />
 				<Scene />
 				<CameraController />
 				<EffectComposer multisampling={0}>
-					{/* Disable multisampling for better performance */}
 					<Bloom
 						intensity={15}
-						kernelSize={KernelSize.VERY_LARGE} // Reduced from LARGE
+						kernelSize={KernelSize.VERY_LARGE}
 						luminanceThreshold={0.9}
 						luminanceSmoothing={0.05}
 						mipmapBlur={true}
 						resolutionX={Resolution.AUTO_SIZE}
 						resolutionY={Resolution.AUTO_SIZE}
 					/>
-					<ChromaticAberration offset={[0.002, 0.002]} />
+					<ChromaticAberration
+						offset={glitchActive ? [0.01, 0.01] : [0.002, 0.002]}
+					/>
 					<Scanline
-						blendFunction={BlendFunction.OVERLAY} // blend mode
-						density={1.75}
+						blendFunction={BlendFunction.OVERLAY}
+						density={glitchActive ? 4 : 1.75}
 					/>
 					<Glitch
-						delay={[1.5, 3.5]} // min and max glitch delay
-						duration={[0.1, 0.2]} // min and max glitch duration
-						strength={[0.01, 0.1]} // min and max glitch strength
-						active // turn on/off the effect (switches between "mode" prop and GlitchMode.DISABLED)
-						ratio={1} // Threshold for strong glitches, 0 - no weak glitches, 1 - no strong glitches.
+						delay={[1.5, 3.5]}
+						duration={[0.1, 0.2]}
+						strength={glitchActive ? [0.2, 0.5] : [0.01, 0.1]}
+						active
+						ratio={glitchActive ? 0.85 : 1}
 					/>
 				</EffectComposer>
 			</Canvas>

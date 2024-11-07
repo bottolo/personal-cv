@@ -105,7 +105,7 @@ export const hologramAnimations = {
 	pulse: {
 		animate: {
 			opacity: [0.4, 0.7, 0.4],
-			scale: [1, 1.05, 1],
+			scale: [1, 1.001, 1],
 		},
 		transition: {
 			duration: 2,

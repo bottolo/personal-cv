@@ -1,13 +1,11 @@
 import { AnimatedRings } from "./components/animated-rings/AnimatedRings.tsx";
 import { GlitchyTextPool } from "./components/animated-text/GlitchyTextPool.tsx";
-import { AnimatedWindows } from "./components/animated-windows/AnimatedWindows.tsx";
 import { GridOverlay } from "./components/grid-overlay/GridOverlay.tsx";
 
 export const Background = () => {
 	return (
 		<>
 			<GridOverlay />
-			<AnimatedWindows />
 			<AnimatedRings className={"fixed h-full w-full z-[-1]"} />
 
 			<GlitchyTextPool
