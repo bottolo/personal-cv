@@ -1,5 +1,5 @@
 import { Background } from "./components/background/Background";
-import { Choices } from "./components/choices/Choices";
+import { Choices } from "./components/choices/Choices.tsx";
 import Cursor from "./components/cursor/Cursor.tsx";
 import Content from "./components/projects/Content.tsx";
 import TiltContainer from "./components/tilt-container/TiltContainer.tsx";
@@ -12,7 +12,8 @@ function App() {
 		<TiltContainer>
 			<Cursor />
 			<Background />
-			<Choices className="absolute bottom-[50px] right-[200px] w-[650px] h-[300px] bg-transparent" />
+
+			<Choices />
 			{currentDialogue && <Content />}
 		</TiltContainer>
 	);

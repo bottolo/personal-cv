@@ -1,28 +1,24 @@
+// In dialogues.tsx
 import type { Dialogue } from "./dialogue-types.ts";
 
 export const DIALOGUES: Record<string, Dialogue> = {
-	firstChoice: {
-		id: "firstChoice",
+	"/projects": {
 		name: "/projects",
 		dialogue: [
 			"Welcome to our world! I'll be your guide.",
 			"Let me show you around...",
 			"Feel free to explore and ask questions!",
 		],
-		avatar: "idle",
 	},
-	secondChoice: {
-		id: "secondChoice",
+	"/about": {
 		name: "/about",
 		dialogue: [
 			"There's something you need to know...",
 			"The ancient prophecy speaks of a chosen one.",
 			"Could it be you?",
 		],
-		avatar: "idle",
 	},
-	thirdChoice: {
-		id: "thirdChoice",
+	"/contacts": {
 		name: "/contacts",
 		dialogue: [
 			"i have no physical form, but i can be reached through the terminal",
@@ -32,6 +28,5 @@ export const DIALOGUES: Record<string, Dialogue> = {
 			"oh, and also i have a github account: github.com/bottolo",
 			"bye now",
 		],
-		avatar: "idle",
 	},
 };

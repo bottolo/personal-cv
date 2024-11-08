@@ -18,7 +18,7 @@ export const useDialogueStore = create<DialogueState>((set) => ({
 	currentPage: 0,
 	isDialogueActive: false,
 
-	setCurrentDialogue: (dialogueId) =>
+	setCurrentDialogue: (dialogueId: string | null) =>
 		set(() => ({
 			currentDialogue: dialogueId ? DIALOGUES[dialogueId] : null,
 			currentPage: 0,
