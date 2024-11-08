@@ -1,4 +1,3 @@
-// BaseButton.tsx
 import { Text, useGLTF } from "@react-three/drei";
 import { useMemo } from "react";
 import * as THREE from "three";
@@ -6,7 +5,7 @@ import {
 	type BaseButtonProps,
 	type ButtonGLTFResult,
 	defaultMaterialOptions,
-} from "../../choices/utils/button-utils.ts";
+} from "../utils/button-utils.ts";
 
 export function BaseButton({
 	color = defaultMaterialOptions.color,

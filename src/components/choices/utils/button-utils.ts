@@ -8,10 +8,23 @@ export const defaultMaterialOptions = {
 	roughness: 0.3,
 } as const;
 
+export interface ButtonState {
+	position: [number, number, number];
+	rotation: [number, number, number];
+	textPosition: [number, number, number];
+}
+
 export interface ButtonProps extends GroupProps {
 	color?: string;
 	metalness?: number;
 	roughness?: number;
+}
+export interface BaseButtonProps extends ButtonProps {
+	text: string;
+	modelPath: string;
+	geometryName: string;
+	textPosition?: [number, number, number];
+	textRotation?: [number, number, number];
 }
 
 export type ButtonGLTFResult<T extends string> = GLTF & {
@@ -22,11 +35,3 @@ export type ButtonGLTFResult<T extends string> = GLTF & {
 		[K in T]: THREE.MeshStandardMaterial;
 	};
 };
-
-export interface BaseButtonProps extends ButtonProps {
-	text: string;
-	modelPath: string;
-	geometryName: string;
-	textPosition?: [number, number, number];
-	textRotation?: [number, number, number];
-}
