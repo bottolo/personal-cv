@@ -1,73 +1,133 @@
 import { PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Grid } from "@react-three/postprocessing";
-import { useState } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { useDialogueStore } from "../../store/dialogue-store";
 import { AnimatedButton } from "./components/AnimatedButton";
 import { buttonPositions } from "./utils/button-states";
 
-export const Choices = () => {
+const BUTTONS = [
+	{
+		id: "projects",
+		text: "/projects",
+		modelPath: "/projects_button.glb",
+		geometryName: "ProjectsButton",
+	},
+	{
+		id: "about",
+		text: "/about",
+		modelPath: "/about_button.glb",
+		geometryName: "AboutButton",
+	},
+	{
+		id: "contacts",
+		text: "/contacts",
+		modelPath: "/contacts_button.glb",
+		geometryName: "ContactsButton",
+	},
+] as const;
+
+const Lights = memo(() => (
+	<>
+		<ambientLight intensity={0.3} />
+		<directionalLight position={[-100, -10, 2]} intensity={0.1} />
+	</>
+));
+
+Lights.displayName = "Lights";
+
+const Camera = memo(() => (
+	<PerspectiveCamera makeDefault position={[-3.5, 0.8, 6]} />
+));
+
+Camera.displayName = "Camera";
+
+const Effects = memo(() => (
+	<EffectComposer>
+		<Grid scale={2} />
+	</EffectComposer>
+));
+
+Effects.displayName = "Effects";
+
+const ButtonsContainer = memo(
+	({
+		activeButton,
+		handleButtonClick,
+		handleButtonHover,
+	}: {
+		activeButton: string | null;
+		handleButtonClick: (path: string) => void;
+		handleButtonHover: (buttonId: string, isHovered: boolean) => void;
+	}) => (
+		<>
+			{BUTTONS.map((button) => (
+				<AnimatedButton
+					key={button.id}
+					text={button.text}
+					modelPath={button.modelPath}
+					geometryName={button.geometryName}
+					buttonId={button.id}
+					activeButton={activeButton}
+					positions={buttonPositions}
+					onClick={() => handleButtonClick(button.text)}
+					onHover={(isHovered) => handleButtonHover(button.id, isHovered)}
+				/>
+			))}
+		</>
+	),
+);
+
+ButtonsContainer.displayName = "ButtonsContainer";
+
+export const Choices = memo(() => {
 	const { setCurrentDialogue, currentDialogue } = useDialogueStore();
-	const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
-	const activeButton = currentDialogue?.name.slice(1) || null;
+	const activeButton = useMemo(
+		() => currentDialogue?.name.slice(1) || null,
+		[currentDialogue?.name],
+	);
 
-	const handleButtonHover = (buttonId: string, isHovered: boolean) => {
-		setHoveredButton(isHovered ? buttonId : null);
-	};
+	const handleButtonClick = useCallback(
+		(path: string) => {
+			setCurrentDialogue(currentDialogue?.name === path ? null : path);
+		},
+		[currentDialogue?.name, setCurrentDialogue],
+	);
 
-	const handleButtonClick = (path: string) => {
-		if (currentDialogue?.name === path) {
-			// If clicking the same button, set dialogue to null
-			setCurrentDialogue(null);
-		} else {
-			// If clicking a different button, set the new dialogue
-			setCurrentDialogue(path);
-		}
-	};
+	const handleButtonHover = useCallback(
+		(buttonId: string, isHovered: boolean) => {
+			// Consider using a ref if hover state doesn't need to trigger re-renders
+			// or handle hover effects directly in the AnimatedButton component
+		},
+		[],
+	);
+
+	const canvasConfig = useMemo(
+		() => ({
+			shadows: "soft" as const,
+			gl: {
+				antialias: true,
+				powerPreference: "high-performance",
+			},
+			dpr: window.devicePixelRatio > 2 ? 2 : window.devicePixelRatio,
+			performance: { min: 0.5 },
+		}),
+		[],
+	);
 
 	return (
-		<Canvas shadows="soft">
-			<PerspectiveCamera makeDefault position={[-3.5, 0.8, 6]} />
-			<EffectComposer>
-				<Grid scale={2} />
-			</EffectComposer>
-
-			<AnimatedButton
-				text="/projects"
-				modelPath="/projects_button.glb"
-				geometryName="ProjectsButton"
-				buttonId="projects"
+		<Canvas {...canvasConfig}>
+			<Camera />
+			<Effects />
+			<ButtonsContainer
 				activeButton={activeButton}
-				positions={buttonPositions}
-				onClick={() => handleButtonClick("/projects")}
-				onHover={(isHovered) => handleButtonHover("projects", isHovered)}
+				handleButtonClick={handleButtonClick}
+				handleButtonHover={handleButtonHover}
 			/>
-
-			<AnimatedButton
-				text="/about"
-				modelPath="/about_button.glb"
-				geometryName="AboutButton"
-				buttonId="about"
-				activeButton={activeButton}
-				positions={buttonPositions}
-				onClick={() => handleButtonClick("/about")}
-				onHover={(isHovered) => handleButtonHover("about", isHovered)}
-			/>
-
-			<AnimatedButton
-				text="/contacts"
-				modelPath="/contacts_button.glb"
-				geometryName="ContactsButton"
-				buttonId="contacts"
-				activeButton={activeButton}
-				positions={buttonPositions}
-				onClick={() => handleButtonClick("/contacts")}
-				onHover={(isHovered) => handleButtonHover("contacts", isHovered)}
-			/>
-
-			<ambientLight intensity={0.3} />
-			<directionalLight position={[-100, -10, 2]} intensity={0.1} />
+			<Lights />
 		</Canvas>
 	);
-};
+});
+
+Choices.displayName = "Choices";

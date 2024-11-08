@@ -65,7 +65,6 @@ export const RingScene = memo(() => {
 	return (
 		<>
 			<Environment preset="night" />
-			<fog attach="fog" args={[COLORS.palette.purple.dark, 5, 50]} />
 			<ambientLight intensity={5} color={COLORS.palette.blue.light} />
 			<directionalLight
 				position={[-10, 5, 10]}
@@ -147,7 +146,7 @@ export const RingScene = memo(() => {
 						emissiveIntensity: 1,
 						opacity: 0.3,
 					}}
-					scale={60}
+					scale={50}
 					rotationOptions={{
 						axis: "x",
 						speed: 0.1,
@@ -186,7 +185,7 @@ export const RingScene = memo(() => {
 
 			<instancedMesh count={2} geometry={cubeGeometry}>
 				<Cube
-					position={[-25, 30, -30]}
+					position={[-50, 75, -50]}
 					rotation={[0, 0.5, 6]}
 					materialOptions={{
 						...solidMaterial,
@@ -195,7 +194,7 @@ export const RingScene = memo(() => {
 					scale={25}
 				/>
 				<Cube
-					position={[40, -50, -10]}
+					position={[40, -50, -20]}
 					rotation={[0, 0.5, 6]}
 					materialOptions={{
 						...solidMaterial,

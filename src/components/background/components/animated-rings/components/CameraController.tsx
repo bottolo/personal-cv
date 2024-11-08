@@ -19,7 +19,7 @@ const CAMERA_POSITIONS = {
 		target: new THREE.Vector3(-10, -20, 15),
 	},
 	default: {
-		position: new THREE.Vector3(-5, 2, 10.5),
+		position: new THREE.Vector3(-5, 2, 10),
 		target: new THREE.Vector3(-3.5, 1, 3),
 	},
 };

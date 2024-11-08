@@ -1,9 +1,15 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useCallback, useMemo } from "react";
+import {
+	COLORS,
+	createHologramGradient,
+	hologramAnimations,
+} from "../../global-utils/colors.ts";
 
 interface TiltProps {
 	children: React.ReactNode;
 }
+
 const TiltContainer = ({ children }: TiltProps) => {
 	const mouseX = useMotionValue(0);
 	const mouseY = useMotionValue(0);
@@ -73,13 +79,41 @@ const TiltContainer = ({ children }: TiltProps) => {
 		() => ({
 			scale: 1.0,
 			transformStyle: "preserve-3d",
+			background: createHologramGradient(
+				"135deg",
+				COLORS.palette.blue.primary,
+				[".05", ".02"],
+			),
 		}),
 		[],
 	);
 
 	return (
 		<div className="fixed inset-0 w-screen h-screen overflow-hidden cursor-none">
-			{/* Main content with lower z-index */}
+			{/* Grid overlay */}
+			<div
+				className="absolute inset-0 pointer-events-none"
+				style={{
+					backgroundImage: `
+                        linear-gradient(to right, ${COLORS.grid.line} 1px, transparent 1px),
+                        linear-gradient(to bottom, ${COLORS.grid.line} 1px, transparent 1px)
+                    `,
+					backgroundSize: "20px 20px",
+					opacity: 0.5,
+				}}
+			/>
+
+			{/* Particle effect */}
+			<motion.div
+				className="absolute inset-0 pointer-events-none"
+				style={{
+					background: `radial-gradient(circle at 50% 50%, ${COLORS.effects.particles}, transparent 70%)`,
+				}}
+				animate={hologramAnimations.pulse.animate}
+				transition={hologramAnimations.pulse.transition}
+			/>
+
+			{/* Main content */}
 			<div
 				onMouseMove={handleMouseMove}
 				onMouseLeave={handleMouseLeave}
@@ -98,13 +132,20 @@ const TiltContainer = ({ children }: TiltProps) => {
 				</motion.div>
 			</div>
 
-			{/* Border overlay with highest z-index */}
-			<div
-				className="fixed inset-0 pointer-events-none"
-				style={{ zIndex: 9996 }}
-			>
-				<div className="w-full h-full border-[50px] border-white" />
-			</div>
+			{/* Scan line effect */}
+			<motion.div
+				className="absolute inset-0 pointer-events-none"
+				style={{
+					background: createHologramGradient(
+						"180deg",
+						COLORS.effects.scanLine,
+						[".3", "0"],
+					),
+					height: "10%",
+				}}
+				animate={hologramAnimations.scan.animate}
+				transition={hologramAnimations.scan.transition}
+			/>
 		</div>
 	);
 };
