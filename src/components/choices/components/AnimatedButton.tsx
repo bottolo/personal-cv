@@ -65,7 +65,6 @@ export const AnimatedButton = ({
 	const isActive = buttonId === activeButton;
 	const [isHovered, setIsHovered] = useState(false);
 
-	// Memoize material creation
 	const material = useMemo(() => {
 		const material = new THREE.MeshStandardMaterial({
 			color: isActive
@@ -80,12 +79,10 @@ export const AnimatedButton = ({
 			opacity: !activeButton ? opacityValues.default : opacityValues.inactive,
 		});
 
-		// Optimize material for performance
 		material.needsUpdate = false;
 		return material;
 	}, [isActive, activeButton, metalness, roughness]);
 
-	// Memoize text configuration
 	const textConfig = useMemo(
 		() => ({
 			color: COLORS.text.secondary,
@@ -99,7 +96,6 @@ export const AnimatedButton = ({
 		[],
 	);
 
-	// Memoize position calculation
 	const currentPosition = useMemo(
 		() =>
 			activeButton
@@ -108,7 +104,6 @@ export const AnimatedButton = ({
 		[activeButton, buttonId, positions],
 	);
 
-	// Memoize button color calculation
 	const buttonColor = useMemo(() => {
 		if (isHovered) return colorInstances.hover;
 		if (isActive) return colorInstances.active;
@@ -116,7 +111,6 @@ export const AnimatedButton = ({
 		return colorInstances.inactive;
 	}, [isHovered, isActive, activeButton]);
 
-	// Memoize hover handlers
 	const handleHoverStart = useCallback(() => {
 		setIsHovered(true);
 		onHover?.(true);
@@ -127,7 +121,6 @@ export const AnimatedButton = ({
 		onHover?.(false);
 	}, [onHover]);
 
-	// Memoize animation values
 	const animatePosition = useMemo(
 		() => ({
 			x: currentPosition.position[0],

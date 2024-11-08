@@ -1,63 +1,140 @@
 import { Environment } from "@react-three/drei";
 import { Suspense, memo, useMemo } from "react";
 import * as THREE from "three";
-import { Cube } from "../../../../3d-models/Cube.tsx";
-import { Dodecahedron } from "../../../../3d-models/Dodecahedron.tsx";
-import { Sphere } from "../../../../3d-models/Sphere.tsx";
-import { Tetrahedron } from "../../../../3d-models/Tetrahedron.tsx";
-import { Halottolo } from "../../../../3d-models/halottolo.tsx";
+import { COLORS } from "../../../../../global-utils/colors.ts";
+import { Cube } from "../../../../3d-models/Cube";
+import { Hourglass } from "../../../../3d-models/Hourglass";
+import { Icosphere } from "../../../../3d-models/Icosphere";
+import { Sphere } from "../../../../3d-models/Sphere";
+import { Spiral } from "../../../../3d-models/Spiral";
+import { Tetrahedron } from "../../../../3d-models/Tetrahedron";
+import { Halottolo } from "../../../../3d-models/halottolo";
 
 const commonMaterialOptions = {
-	emissive: "#612dc7",
+	emissive: COLORS.palette.purple.primary,
 	emissiveIntensity: 0.5,
 };
 
 const wireframeMaterial = {
 	...commonMaterialOptions,
-	color: "#ffffff",
-	wireframe: false,
+	color: COLORS.palette.white,
+	wireframe: true,
 	opacity: 0.4,
+	transparent: true,
 };
 
 const solidMaterial = {
 	...commonMaterialOptions,
-	color: "#8d35e0",
+	color: COLORS.palette.blue.primary,
+	emissive: COLORS.palette.purple.primary,
 	wireframe: false,
-	opacity: 1,
+	opacity: 0.8,
+	transparent: true,
+};
+
+const glowMaterial = {
+	...commonMaterialOptions,
+	color: COLORS.palette.cyan.primary,
+	emissive: COLORS.palette.blue.primary,
+	emissiveIntensity: 0.75,
+	opacity: 0.6,
+	transparent: true,
 };
 
 export const RingScene = memo(() => {
 	const sphereGeometry = useMemo(() => new THREE.SphereGeometry(1, 32, 32), []);
 	const cubeGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
 
+	const spiralInstances = useMemo(() => {
+		const count = 8;
+		const radius = 15;
+		return Array.from({ length: count }, (_, index) => {
+			const angle = (index / count) * Math.PI * 2;
+			return {
+				position: [Math.cos(angle) * radius, 0, Math.sin(angle) * radius] as [
+					number,
+					number,
+					number,
+				],
+				rotation: [0, angle, 0] as [number, number, number],
+				scale: 2,
+			};
+		});
+	}, []);
+
 	return (
 		<>
 			<Environment preset="night" />
-			<fog attach="fog" args={["#4c1d95", 5, 50]} />
-			<ambientLight intensity={5} />
-			<directionalLight position={[-10, 5, 10]} intensity={1} castShadow />
+			<fog attach="fog" args={[COLORS.palette.purple.dark, 5, 50]} />
+			<ambientLight intensity={5} color={COLORS.palette.blue.light} />
+			<directionalLight
+				position={[-10, 5, 10]}
+				intensity={1}
+				castShadow
+				color={COLORS.palette.cyan.primary}
+			/>
 
 			<Suspense fallback={null}>
 				<Halottolo
-					rotationOptions={{
-						speed: 0.1,
-					}}
+					rotationOptions={{ speed: 0.1 }}
 					rotation={[1.9, 1.25, -0.5]}
 					position={[-3.5, 1, 5]}
+					materialOptions={{
+						...glowMaterial,
+						emissiveIntensity: 1,
+					}}
 				/>
 			</Suspense>
 
-			<Dodecahedron
-				position={[-3, 1, 3]}
-				materialOptions={wireframeMaterial}
-				scale={2}
+			<Spiral
+				position={[-5, -15, 4.7]}
+				rotation={[-0.1, 0, -0.2]}
+				instances={spiralInstances}
+				materialOptions={{
+					...wireframeMaterial,
+					color: COLORS.palette.cyan.primary,
+					emissive: COLORS.palette.blue.primary,
+					opacity: 0.6,
+				}}
+				rotationOptions={{
+					axis: "y",
+					speed: 0.5,
+				}}
+				instanceRotation={true}
+				scale={10}
+			/>
+
+			<Icosphere
+				position={[-4, 1.5, 4.9]}
+				scale={3}
+				materialOptions={{
+					...wireframeMaterial,
+					emissiveIntensity: 0.3,
+				}}
+				rotationOptions={{
+					axis: "y",
+					speed: 0.2,
+				}}
+			/>
+			<Icosphere
+				position={[-50, -110, -50]}
+				materialOptions={{
+					...glowMaterial,
+					emissiveIntensity: 1,
+					opacity: 0.3,
+				}}
+				scale={50}
+				rotationOptions={{
+					axis: "x",
+					speed: 0.02,
+				}}
 			/>
 
 			<Tetrahedron
 				position={[-5.4, 1, 7]}
 				materialOptions={{
 					...solidMaterial,
-					opacity: 0.2,
+					opacity: 0.4,
 				}}
 				scale={0.3}
 			/>
@@ -66,28 +143,46 @@ export const RingScene = memo(() => {
 				<Sphere
 					position={[50, 30, -30]}
 					materialOptions={{
-						...wireframeMaterial,
-						opacity: 0.5,
+						...glowMaterial,
 						emissiveIntensity: 1,
+						opacity: 0.3,
 					}}
 					scale={60}
+					rotationOptions={{
+						axis: "x",
+						speed: 0.1,
+					}}
 				/>
 				<Sphere
 					position={[-10, -20, -15]}
 					rotation={[0, 0.3, 3]}
-					materialOptions={solidMaterial}
+					materialOptions={{
+						...solidMaterial,
+						opacity: 0.8,
+					}}
 					scale={5}
 				/>
 				<Sphere
 					position={[-5, 20, -10]}
 					rotation={[0, 0.3, 3]}
-					materialOptions={{
-						...wireframeMaterial,
-						opacity: 1,
-					}}
+					materialOptions={wireframeMaterial}
 					scale={5}
 				/>
 			</instancedMesh>
+
+			<Hourglass
+				position={[-30, -10, -15]}
+				rotation={[9, 2, 0]}
+				scale={30}
+				instances={[
+					{ position: [-30, -10, -15], rotation: [9, 2, 0], scale: 30 },
+					{ position: [-25, -8, -12], rotation: [8, 1.5, 0.5], scale: 25 },
+				]}
+				materialOptions={{
+					...wireframeMaterial,
+					emissiveIntensity: 0.8,
+				}}
+			/>
 
 			<instancedMesh count={2} geometry={cubeGeometry}>
 				<Cube
