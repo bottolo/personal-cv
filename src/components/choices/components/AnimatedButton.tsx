@@ -3,7 +3,7 @@ import { motion } from "framer-motion-3d";
 import { useMemo } from "react";
 import * as THREE from "three";
 import { COLORS } from "../../../global-utils/colors";
-import type { ButtonPositions } from "../utils/button-states.ts";
+import type { ButtonPositions } from "../utils/button-states";
 import type { ButtonGLTFResult } from "../utils/button-utils";
 
 interface AnimatedButtonProps {
@@ -13,7 +13,7 @@ interface AnimatedButtonProps {
 	buttonId: string;
 	activeButton: string | null;
 	positions: ButtonPositions;
-	color?: string;
+	color?: string | THREE.Color;
 	metalness?: number;
 	roughness?: number;
 	onHover?: (isHovered: boolean) => void;
@@ -24,7 +24,7 @@ const defaultMaterialOptions = {
 	color: "#8c75e1",
 	metalness: 1,
 	roughness: 0.3,
-};
+} as const;
 
 export const AnimatedButton = ({
 	text,
@@ -44,7 +44,8 @@ export const AnimatedButton = ({
 
 	const material = useMemo(() => {
 		const materialColor =
-			color instanceof THREE.Color ? color : new THREE.Color(color);
+			color instanceof THREE.Color ? color.clone() : new THREE.Color(color);
+
 		return new THREE.MeshStandardMaterial({
 			color: materialColor,
 			metalness,
@@ -81,7 +82,7 @@ export const AnimatedButton = ({
 		stiffness: 100,
 		damping: 30,
 		mass: 0.5,
-	};
+	} as const;
 
 	const getButtonColor = () => {
 		if (isActive) {
