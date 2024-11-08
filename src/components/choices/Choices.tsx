@@ -3,8 +3,8 @@ import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Grid } from "@react-three/postprocessing";
 import { useState } from "react";
 import { useDialogueStore } from "../../store/dialogue-store";
-import { AnimatedButton } from "./components/AnimatedButton.tsx";
-import { defaultState, hoverState } from "./utils/button-states.ts";
+import { AnimatedButton } from "./components/AnimatedButton";
+import { buttonPositions } from "./utils/button-states.ts";
 
 export const Choices = () => {
 	const { setCurrentDialogue, currentDialogue } = useDialogueStore();
@@ -18,7 +18,7 @@ export const Choices = () => {
 
 	return (
 		<Canvas shadows="soft">
-			<PerspectiveCamera makeDefault position={[-3.5, 1, 6]} />
+			<PerspectiveCamera makeDefault position={[-3.5, 0.8, 6]} />
 			<EffectComposer>
 				<Grid scale={2} />
 			</EffectComposer>
@@ -28,10 +28,8 @@ export const Choices = () => {
 				modelPath="/projects_button.glb"
 				geometryName="ProjectsButton"
 				buttonId="projects"
-				initialState={defaultState.projects}
-				hoverState={hoverState.projects}
-				hoveredButton={hoveredButton}
 				activeButton={activeButton}
+				positions={buttonPositions}
 				onClick={() => setCurrentDialogue("/projects")}
 				onHover={(isHovered) => handleButtonHover("projects", isHovered)}
 			/>
@@ -41,10 +39,8 @@ export const Choices = () => {
 				modelPath="/about_button.glb"
 				geometryName="AboutButton"
 				buttonId="about"
-				initialState={defaultState.about}
-				hoverState={hoverState.about}
-				hoveredButton={hoveredButton}
 				activeButton={activeButton}
+				positions={buttonPositions} // Using the same positions config
 				onClick={() => setCurrentDialogue("/about")}
 				onHover={(isHovered) => handleButtonHover("about", isHovered)}
 			/>
@@ -54,10 +50,8 @@ export const Choices = () => {
 				modelPath="/contacts_button.glb"
 				geometryName="ContactsButton"
 				buttonId="contacts"
-				initialState={defaultState.contacts}
-				hoverState={hoverState.contacts}
-				hoveredButton={hoveredButton}
 				activeButton={activeButton}
+				positions={buttonPositions} // Using the same positions config
 				onClick={() => setCurrentDialogue("/contacts")}
 				onHover={(isHovered) => handleButtonHover("contacts", isHovered)}
 			/>

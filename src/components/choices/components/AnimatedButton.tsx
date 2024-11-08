@@ -1,80 +1,47 @@
-import { animated, useSpring } from "@react-spring/three";
 import { Text, useGLTF } from "@react-three/drei";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { motion } from "framer-motion-3d";
+import { useMemo } from "react";
 import * as THREE from "three";
 import { HOLOGRAM_COLORS } from "../../../global-utils/colors";
-import { offsetMap } from "../utils/button-states";
-import {
-	type ButtonGLTFResult,
-	type ButtonProps,
-	type ButtonState,
-	defaultMaterialOptions,
-	getPositionWhenOtherHovered,
-} from "../utils/button-utils";
+import type { ButtonPositions } from "../utils/button-states.ts";
+import type { ButtonGLTFResult } from "../utils/button-utils";
 
-const SPRING_CONFIG = {
-	mass: 1,
-	tension: 280,
-	friction: 50,
-	precision: 0.001,
-};
-
-const HOVER_TIMEOUT = 3000;
-
-interface AnimatedButtonProps extends ButtonProps {
+interface AnimatedButtonProps {
 	text: string;
 	modelPath: string;
 	geometryName: string;
-	initialState: ButtonState;
-	hoverState: ButtonState;
 	buttonId: string;
-	hoveredButton: string | null;
 	activeButton: string | null;
-	onHover?: (isHovered: boolean) => void;
+	positions: ButtonPositions;
 	color?: string;
 	metalness?: number;
 	roughness?: number;
+	onHover?: (isHovered: boolean) => void;
+	onClick?: () => void;
 }
+
+const defaultMaterialOptions = {
+	color: "#8c75e1",
+	metalness: 1,
+	roughness: 0.3,
+};
 
 export const AnimatedButton = ({
 	text,
 	modelPath,
 	geometryName,
-	initialState,
-	hoverState,
 	buttonId,
-	hoveredButton,
 	activeButton,
-	onHover,
+	positions,
 	color = defaultMaterialOptions.color,
 	metalness = defaultMaterialOptions.metalness,
 	roughness = defaultMaterialOptions.roughness,
-	...props
+	onHover,
+	onClick,
 }: AnimatedButtonProps) => {
 	const { nodes } = useGLTF(modelPath) as ButtonGLTFResult<typeof geometryName>;
-	const timeoutRef = useRef<number | null>(null);
 	const isActive = buttonId === activeButton;
 
-	// Cleanup timeout on unmount
-	useEffect(() => {
-		return () => {
-			if (timeoutRef.current !== null) {
-				window.clearTimeout(timeoutRef.current);
-			}
-		};
-	}, []);
-
-	// Get current state based on hover/active status
-	const currentState = getPositionWhenOtherHovered(
-		buttonId,
-		hoveredButton,
-		activeButton,
-		initialState,
-		hoverState,
-		offsetMap,
-	);
-
-	// Create material
 	const material = useMemo(() => {
 		const materialColor =
 			color instanceof THREE.Color ? color : new THREE.Color(color);
@@ -87,7 +54,6 @@ export const AnimatedButton = ({
 		});
 	}, [color, metalness, roughness]);
 
-	// Text configuration
 	const textConfig = useMemo(
 		() => ({
 			color: HOLOGRAM_COLORS.text.secondary,
@@ -101,77 +67,75 @@ export const AnimatedButton = ({
 		[],
 	);
 
-	// Determine button color
+	const getCurrentPosition = () => {
+		if (activeButton) {
+			return positions.active[activeButton][buttonId];
+		}
+		return positions.default[buttonId];
+	};
+
+	const currentPosition = getCurrentPosition();
+
+	const transition = {
+		type: "spring",
+		stiffness: 100,
+		damping: 30,
+		mass: 0.5,
+	};
+
 	const getButtonColor = () => {
 		if (isActive) {
 			return HOLOGRAM_COLORS.accent;
 		}
-		if (!activeButton && buttonId === hoveredButton) {
+		if (!activeButton) {
 			return HOLOGRAM_COLORS.primary;
 		}
 		return HOLOGRAM_COLORS.text.secondary;
 	};
 
-	// Animation springs
-	const { position, rotation, textPosition, buttonColor } = useSpring({
-		position: currentState.position,
-		rotation: currentState.rotation,
-		textPosition: currentState.textPosition,
-		buttonColor: getButtonColor(),
-		config: SPRING_CONFIG,
-		immediate: false,
-	});
-
-	// Event handlers
-	const handlePointerEnter = useCallback(() => {
-		if (activeButton) return;
-
-		if (timeoutRef.current !== null) {
-			window.clearTimeout(timeoutRef.current);
-		}
-
-		onHover?.(true);
-
-		timeoutRef.current = window.setTimeout(() => {
-			onHover?.(false);
-			timeoutRef.current = null;
-		}, HOVER_TIMEOUT);
-	}, [onHover, activeButton]);
-
-	const handlePointerDown = useCallback(() => {
-		if (activeButton) return;
-
-		if (timeoutRef.current !== null) {
-			window.clearTimeout(timeoutRef.current);
-		}
-		onHover?.(false);
-	}, [onHover, activeButton]);
-
-	const AnimatedGroup = animated("group");
-	const AnimatedMesh = animated("mesh");
-	const AnimatedText = animated(Text);
-
 	return (
-		<AnimatedGroup
-			{...props}
-			position={position}
-			rotation={rotation}
-			onPointerEnter={handlePointerEnter}
-			onPointerDown={handlePointerDown}
+		<motion.group
+			initial={false}
+			animate={{
+				x: currentPosition.position[0],
+				y: currentPosition.position[1],
+				z: currentPosition.position[2],
+				rotateX: currentPosition.rotation[0],
+				rotateY: currentPosition.rotation[1],
+				rotateZ: currentPosition.rotation[2],
+			}}
+			whileHover={{
+				scale: 1.1,
+			}}
+			transition={transition}
 			dispose={null}
+			onHoverStart={() => onHover?.(true)}
+			onHoverEnd={() => onHover?.(false)}
+			onClick={onClick}
 		>
-			<AnimatedMesh
+			<motion.mesh
 				name={geometryName}
 				castShadow
 				receiveShadow
 				geometry={nodes[geometryName].geometry}
 				material={material}
 				rotation={[Math.PI / 2, 0, 0]}
+				animate={{
+					color: getButtonColor(),
+				}}
+				transition={transition}
 			/>
 
-			<AnimatedText position={textPosition} {...textConfig} color={buttonColor}>
-				{text}
-			</AnimatedText>
-		</AnimatedGroup>
+			<motion.group
+				animate={{
+					x: currentPosition.textPosition[0],
+					y: currentPosition.textPosition[1],
+					z: currentPosition.textPosition[2],
+				}}
+				transition={transition}
+			>
+				<Text {...textConfig}>{text}</Text>
+			</motion.group>
+		</motion.group>
 	);
 };
