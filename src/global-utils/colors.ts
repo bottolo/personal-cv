@@ -22,10 +22,10 @@ export const COLORS = {
 
 	// Interactive elements
 	button: {
-		default: "rgba(165, 243, 252, 0.6)", // cyan.primary @ 60%
+		default: "rgba(165, 243, 252, 0.95)", // cyan.primary @ 60%
 		hover: "rgb(59, 130, 246)", // blue.primary
 		active: "rgb(147, 51, 234)", // purple.primary
-		inactive: "rgba(165, 243, 252, 0.3)", // cyan.primary @ 30%
+		inactive: "rgba(165, 243, 252, 0.8)", // cyan.primary @ 30%
 	},
 
 	border: {

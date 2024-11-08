@@ -1,6 +1,6 @@
 import { Text, useGLTF } from "@react-three/drei";
 import { motion } from "framer-motion-3d";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import * as THREE from "three";
 import { COLORS } from "../../../global-utils/colors";
 import type { ButtonPositions } from "../utils/button-states";
@@ -20,8 +20,33 @@ interface AnimatedButtonProps {
 }
 
 const defaultMaterialOptions = {
-	metalness: 1,
+	metalness: 0.9,
 	roughness: 0.3,
+} as const;
+
+// Pre-create color instances
+const colorInstances = {
+	hover: new THREE.Color(COLORS.button.hover),
+	active: new THREE.Color(COLORS.button.active),
+	default: new THREE.Color(COLORS.button.default),
+	inactive: new THREE.Color(COLORS.button.inactive),
+} as const;
+
+// Memoize transition config
+const transition = {
+	type: "spring",
+	stiffness: 100,
+	damping: 30,
+	mass: 0.5,
+} as const;
+
+// Extract opacity values once
+const getOpacity = (color: string) =>
+	color.includes("rgba") ? Number.parseFloat(color.split(",")[3]) : 1;
+
+const opacityValues = {
+	default: getOpacity(COLORS.button.default),
+	inactive: getOpacity(COLORS.button.inactive),
 } as const;
 
 export const AnimatedButton = ({
@@ -40,26 +65,27 @@ export const AnimatedButton = ({
 	const isActive = buttonId === activeButton;
 	const [isHovered, setIsHovered] = useState(false);
 
+	// Memoize material creation
 	const material = useMemo(() => {
-		// Get initial color based on state
-		const initialColor = isActive
-			? COLORS.button.active
-			: !activeButton
-				? COLORS.button.default
-				: COLORS.button.inactive;
-
-		return new THREE.MeshStandardMaterial({
-			color: new THREE.Color(initialColor),
+		const material = new THREE.MeshStandardMaterial({
+			color: isActive
+				? colorInstances.active
+				: !activeButton
+					? colorInstances.default
+					: colorInstances.inactive,
 			metalness,
 			roughness,
 			side: THREE.DoubleSide,
 			transparent: true,
-			opacity: initialColor.includes("rgba")
-				? Number.parseFloat(initialColor.split(",")[3])
-				: 1,
+			opacity: !activeButton ? opacityValues.default : opacityValues.inactive,
 		});
+
+		// Optimize material for performance
+		material.needsUpdate = false;
+		return material;
 	}, [isActive, activeButton, metalness, roughness]);
 
+	// Memoize text configuration
 	const textConfig = useMemo(
 		() => ({
 			color: COLORS.text.secondary,
@@ -73,56 +99,60 @@ export const AnimatedButton = ({
 		[],
 	);
 
-	const getCurrentPosition = () => {
-		if (activeButton) {
-			return positions.active[activeButton][buttonId];
-		}
-		return positions.default[buttonId];
-	};
+	// Memoize position calculation
+	const currentPosition = useMemo(
+		() =>
+			activeButton
+				? positions.active[activeButton][buttonId]
+				: positions.default[buttonId],
+		[activeButton, buttonId, positions],
+	);
 
-	const currentPosition = getCurrentPosition();
+	// Memoize button color calculation
+	const buttonColor = useMemo(() => {
+		if (isHovered) return colorInstances.hover;
+		if (isActive) return colorInstances.active;
+		if (!activeButton) return colorInstances.default;
+		return colorInstances.inactive;
+	}, [isHovered, isActive, activeButton]);
 
-	const transition = {
-		type: "spring",
-		stiffness: 100,
-		damping: 30,
-		mass: 0.5,
-	} as const;
-
-	const getButtonColor = () => {
-		if (isHovered) {
-			return COLORS.button.hover;
-		}
-		if (isActive) {
-			return COLORS.button.active;
-		}
-		if (!activeButton) {
-			return COLORS.button.default;
-		}
-		return COLORS.button.inactive;
-	};
-
-	const handleHoverStart = () => {
+	// Memoize hover handlers
+	const handleHoverStart = useCallback(() => {
 		setIsHovered(true);
 		onHover?.(true);
-	};
+	}, [onHover]);
 
-	const handleHoverEnd = () => {
+	const handleHoverEnd = useCallback(() => {
 		setIsHovered(false);
 		onHover?.(false);
-	};
+	}, [onHover]);
+
+	// Memoize animation values
+	const animatePosition = useMemo(
+		() => ({
+			x: currentPosition.position[0],
+			y: currentPosition.position[1],
+			z: currentPosition.position[2],
+			rotateX: currentPosition.rotation[0],
+			rotateY: currentPosition.rotation[1],
+			rotateZ: currentPosition.rotation[2],
+		}),
+		[currentPosition],
+	);
+
+	const textPosition = useMemo(
+		() => ({
+			x: currentPosition.textPosition[0],
+			y: currentPosition.textPosition[1],
+			z: currentPosition.textPosition[2],
+		}),
+		[currentPosition],
+	);
 
 	return (
 		<motion.group
 			initial={false}
-			animate={{
-				x: currentPosition.position[0],
-				y: currentPosition.position[1],
-				z: currentPosition.position[2],
-				rotateX: currentPosition.rotation[0],
-				rotateY: currentPosition.rotation[1],
-				rotateZ: currentPosition.rotation[2],
-			}}
+			animate={animatePosition}
 			whileHover={{
 				scale: 1.1,
 			}}
@@ -140,19 +170,12 @@ export const AnimatedButton = ({
 				material={material}
 				rotation={[Math.PI / 2, 0, 0]}
 				animate={{
-					color: getButtonColor(),
+					color: buttonColor,
 				}}
 				transition={transition}
 			/>
 
-			<motion.group
-				animate={{
-					x: currentPosition.textPosition[0],
-					y: currentPosition.textPosition[1],
-					z: currentPosition.textPosition[2],
-				}}
-				transition={transition}
-			>
+			<motion.group animate={textPosition} transition={transition}>
 				<Text {...textConfig}>{text}</Text>
 			</motion.group>
 		</motion.group>
