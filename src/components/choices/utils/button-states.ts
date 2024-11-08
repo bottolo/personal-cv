@@ -33,3 +33,18 @@ export const hoverState = {
 		textPosition: [-1.05, -0.63, 1.3],
 	},
 };
+
+export const offsetMap = {
+	projects: {
+		about: [0, -0.3, 0],
+		contacts: [0.1, -0.3, 0.2],
+	},
+	about: {
+		projects: [0, 0.3, 0],
+		contacts: [0, -0.3, 0],
+	},
+	contacts: {
+		projects: [0, 0.4, 0],
+		about: [0, 0.3, 0],
+	},
+};
