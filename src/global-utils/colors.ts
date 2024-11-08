@@ -1,79 +1,99 @@
 export const COLORS = {
-	// Base colors
-	primary: "rgb(59, 130, 246)", // blue-400
-	accent: "rgb(165, 243, 252)", // cyan-200
-
-	// Borders
-	border: {
-		normal: "rgba(59, 130, 246, 0.2)",
-		hover: "rgba(59, 130, 246, 0.4)",
+	// Base palette
+	palette: {
+		blue: {
+			primary: "rgb(59, 130, 246)", // blue-400
+			light: "rgb(147, 197, 253)", // blue-300
+			dark: "rgb(30, 58, 138)", // blue-900
+		},
+		cyan: {
+			primary: "rgb(165, 243, 252)", // cyan-200
+		},
+		purple: {
+			primary: "rgb(147, 51, 234)", // purple-600
+			dark: "rgb(88, 28, 135)", // purple-900
+		},
+		white: "rgb(255, 255, 255)",
 	},
 
-	// Backgrounds
+	// Semantic colors
+	primary: "rgb(59, 130, 246)", // blue.primary
+	accent: "rgb(165, 243, 252)", // cyan.primary
+
+	// Interactive elements
+	button: {
+		default: "rgba(165, 243, 252, 0.6)", // cyan.primary @ 60%
+		hover: "rgb(59, 130, 246)", // blue.primary
+		active: "rgb(147, 51, 234)", // purple.primary
+		inactive: "rgba(165, 243, 252, 0.3)", // cyan.primary @ 30%
+	},
+
+	border: {
+		normal: "rgba(59, 130, 246, 0.2)", // blue.primary @ 20%
+		hover: "rgba(59, 130, 246, 0.4)", // blue.primary @ 40%
+	},
+
+	// Background variations
 	bg: {
-		surface: "rgba(59, 130, 246, 0.1)",
-		hover: "rgba(59, 130, 246, 0.2)",
+		surface: "rgba(59, 130, 246, 0.1)", // blue.primary @ 10%
+		hover: "rgba(59, 130, 246, 0.2)", // blue.primary @ 20%
 		gradient: {
-			from: "rgba(30, 58, 138, 0.8)",
-			to: "rgba(88, 28, 135, 0.8)",
+			from: "rgba(30, 58, 138, 0.8)", // blue.dark @ 80%
+			to: "rgba(88, 28, 135, 0.8)", // purple.dark @ 80%
 		},
 	},
 
-	// Text
+	// Typography
 	text: {
-		primary: "rgba(165, 243, 252, 1)",
-		secondary: "rgba(165, 243, 252, 0.8)",
-		muted: "rgba(165, 243, 252, 0.6)",
+		primary: "rgba(165, 243, 252, 1)", // cyan.primary @ 100%
+		secondary: "rgba(165, 243, 252, 0.8)", // cyan.primary @ 80%
+		muted: "rgba(165, 243, 252, 0.6)", // cyan.primary @ 60%
 	},
 
-	// Glow effects
+	// Effects
 	glow: {
-		weak: "0 0 10px rgba(59, 130, 246, 0.2)",
-		medium: "0 0 20px rgba(59, 130, 246, 0.3)",
-		strong: "0 0 30px rgba(59, 130, 246, 0.4)",
+		weak: "0 0 10px rgba(59, 130, 246, 0.2)", // blue.primary @ 20%
+		medium: "0 0 20px rgba(59, 130, 246, 0.3)", // blue.primary @ 30%
+		strong: "0 0 30px rgba(59, 130, 246, 0.4)", // blue.primary @ 40%
 	},
 
-	// Sphere specific
 	sphere: {
 		gradient: {
-			start: "rgba(59, 130, 246, 0.9)",
-			end: "rgba(59, 130, 246, 0.5)",
+			start: "rgba(59, 130, 246, 0.9)", // blue.primary @ 90%
+			end: "rgba(59, 130, 246, 0.5)", // blue.primary @ 50%
 		},
 		glow: {
-			outer: "rgba(59, 130, 246, 0.25)",
-			inner: "rgba(59, 130, 246, 0.4)",
+			outer: "rgba(59, 130, 246, 0.25)", // blue.primary @ 25%
+			inner: "rgba(59, 130, 246, 0.4)", // blue.primary @ 40%
 		},
-		highlight: "rgba(255, 255, 255, 0.25)",
+		highlight: "rgba(255, 255, 255, 0.25)", // white @ 25%
 	},
 
-	// Grid effects
 	grid: {
-		line: "rgba(100, 149, 237, 0.1)",
+		line: "rgba(100, 149, 237, 0.1)", // cornflowerblue @ 10%
 	},
 
-	// Hologram specific effects
 	effects: {
-		scanLine: "rgba(59, 130, 246, 0.3)",
-		particles: "rgba(147, 197, 253, 0.4)", // blue-300/40
+		scanLine: "rgba(59, 130, 246, 0.3)", // blue.primary @ 30%
+		particles: "rgba(147, 197, 253, 0.4)", // blue.light @ 40%
 		glitch: {
-			overlay: "rgba(59, 130, 246, 0.5)",
-			highlight: "rgba(255, 255, 255, 0.4)",
-		},
-		grid: {
-			line: "rgba(100, 149, 237, 0.1)",
+			overlay: "rgba(59, 130, 246, 0.5)", // blue.primary @ 50%
+			highlight: "rgba(255, 255, 255, 0.4)", // white @ 40%
 		},
 	},
 
-	// Terminal specific
 	terminal: {
 		prompt: {
-			user: "rgba(59, 130, 246, 0.9)",
-			separator: "rgba(165, 243, 252, 0.6)",
-			host: "rgba(168, 85, 247, 0.8)", // purple accent
+			user: "rgba(59, 130, 246, 0.9)", // blue.primary @ 90%
+			separator: "rgba(165, 243, 252, 0.6)", // cyan.primary @ 60%
+			host: "rgba(147, 51, 234, 0.8)", // purple.primary @ 80%
 		},
-		cursor: "rgba(165, 243, 252, 0.8)",
+		cursor: "rgba(165, 243, 252, 0.8)", // cyan.primary @ 80%
 	},
-};
+} as const;
+
+// Type for the colors object
+export type Colors = typeof COLORS;
 
 export const hologramAnimations = {
 	glow: {

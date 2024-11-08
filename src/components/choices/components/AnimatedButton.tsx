@@ -1,6 +1,6 @@
 import { Text, useGLTF } from "@react-three/drei";
 import { motion } from "framer-motion-3d";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import * as THREE from "three";
 import { COLORS } from "../../../global-utils/colors";
 import type { ButtonPositions } from "../utils/button-states";
@@ -13,7 +13,6 @@ interface AnimatedButtonProps {
 	buttonId: string;
 	activeButton: string | null;
 	positions: ButtonPositions;
-	color?: string | THREE.Color;
 	metalness?: number;
 	roughness?: number;
 	onHover?: (isHovered: boolean) => void;
@@ -21,7 +20,6 @@ interface AnimatedButtonProps {
 }
 
 const defaultMaterialOptions = {
-	color: "#8c75e1",
 	metalness: 1,
 	roughness: 0.3,
 } as const;
@@ -33,7 +31,6 @@ export const AnimatedButton = ({
 	buttonId,
 	activeButton,
 	positions,
-	color = defaultMaterialOptions.color,
 	metalness = defaultMaterialOptions.metalness,
 	roughness = defaultMaterialOptions.roughness,
 	onHover,
@@ -41,19 +38,27 @@ export const AnimatedButton = ({
 }: AnimatedButtonProps) => {
 	const { nodes } = useGLTF(modelPath) as ButtonGLTFResult<typeof geometryName>;
 	const isActive = buttonId === activeButton;
+	const [isHovered, setIsHovered] = useState(false);
 
 	const material = useMemo(() => {
-		const materialColor =
-			color instanceof THREE.Color ? color.clone() : new THREE.Color(color);
+		// Get initial color based on state
+		const initialColor = isActive
+			? COLORS.button.active
+			: !activeButton
+				? COLORS.button.default
+				: COLORS.button.inactive;
 
 		return new THREE.MeshStandardMaterial({
-			color: materialColor,
+			color: new THREE.Color(initialColor),
 			metalness,
 			roughness,
 			side: THREE.DoubleSide,
-			transparent: false,
+			transparent: true,
+			opacity: initialColor.includes("rgba")
+				? Number.parseFloat(initialColor.split(",")[3])
+				: 1,
 		});
-	}, [color, metalness, roughness]);
+	}, [isActive, activeButton, metalness, roughness]);
 
 	const textConfig = useMemo(
 		() => ({
@@ -85,13 +90,26 @@ export const AnimatedButton = ({
 	} as const;
 
 	const getButtonColor = () => {
+		if (isHovered) {
+			return COLORS.button.hover;
+		}
 		if (isActive) {
-			return COLORS.accent;
+			return COLORS.button.active;
 		}
 		if (!activeButton) {
-			return COLORS.primary;
+			return COLORS.button.default;
 		}
-		return COLORS.text.secondary;
+		return COLORS.button.inactive;
+	};
+
+	const handleHoverStart = () => {
+		setIsHovered(true);
+		onHover?.(true);
+	};
+
+	const handleHoverEnd = () => {
+		setIsHovered(false);
+		onHover?.(false);
 	};
 
 	return (
@@ -110,8 +128,8 @@ export const AnimatedButton = ({
 			}}
 			transition={transition}
 			dispose={null}
-			onHoverStart={() => onHover?.(true)}
-			onHoverEnd={() => onHover?.(false)}
+			onHoverStart={handleHoverStart}
+			onHoverEnd={handleHoverEnd}
 			onClick={onClick}
 		>
 			<motion.mesh

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { COLORS, hologramAnimations } from "../../../global-utils/colors.ts";
+import { COLORS, hologramAnimations } from "../../../global-utils/colors";
 import { GlitchAvatar } from "./GlitchAvatar";
 
 export const Header = () => {
@@ -89,11 +89,11 @@ export const Header = () => {
 				style={{
 					backgroundImage: `
                         linear-gradient(to right, 
-                            ${COLORS.effects.grid.line} 1px, 
+                            ${COLORS.grid.line} 1px, 
                             transparent 1px
                         ),
                         linear-gradient(to bottom, 
-                            ${COLORS.effects.grid.line} 1px, 
+                            ${COLORS.grid.line} 1px, 
                             transparent 1px
                         )
                     `,
