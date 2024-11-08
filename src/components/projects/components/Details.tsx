@@ -1,10 +1,7 @@
 import { motion, useAnimationControls } from "framer-motion";
 import { memo, useEffect, useMemo, useState } from "react";
 import { NoiseEffect } from "../../../global-utils/NoiseEffect.tsx";
-import {
-	HOLOGRAM_COLORS,
-	hologramAnimations,
-} from "../../../global-utils/colors.ts";
+import { COLORS, hologramAnimations } from "../../../global-utils/colors.ts";
 import type { Project } from "../utils/projects.ts";
 
 const ANIMATION_SEQUENCE = {
@@ -58,10 +55,10 @@ const MarbleButton = memo(
 	}) => {
 		const buttonStyle = useMemo(
 			() => ({
-				background: `linear-gradient(135deg, ${HOLOGRAM_COLORS.sphere.gradient.start}, ${HOLOGRAM_COLORS.sphere.gradient.end})`,
-				boxShadow: `0 5px 15px ${HOLOGRAM_COLORS.sphere.glow.outer},
-                    inset -2px -2px 6px ${HOLOGRAM_COLORS.sphere.glow.inner},
-                    inset 2px 2px 6px ${HOLOGRAM_COLORS.sphere.highlight}`,
+				background: `linear-gradient(135deg, ${COLORS.sphere.gradient.start}, ${COLORS.sphere.gradient.end})`,
+				boxShadow: `0 5px 15px ${COLORS.sphere.glow.outer},
+                    inset -2px -2px 6px ${COLORS.sphere.glow.inner},
+                    inset 2px 2px 6px ${COLORS.sphere.highlight}`,
 			}),
 			[],
 		);
@@ -69,9 +66,9 @@ const MarbleButton = memo(
 		const hoverAnimation = useMemo(
 			() => ({
 				scale: 1.05,
-				boxShadow: `0 10px 30px ${HOLOGRAM_COLORS.sphere.glow.outer},
-                    inset -2px -2px 10px ${HOLOGRAM_COLORS.sphere.glow.inner},
-                    inset 2px 2px 10px ${HOLOGRAM_COLORS.sphere.highlight}`,
+				boxShadow: `0 10px 30px ${COLORS.sphere.glow.outer},
+                    inset -2px -2px 10px ${COLORS.sphere.glow.inner},
+                    inset 2px 2px 10px ${COLORS.sphere.highlight}`,
 			}),
 			[],
 		);
@@ -86,7 +83,7 @@ const MarbleButton = memo(
 					isClose
 						? {
 								background: [
-									`linear-gradient(135deg, ${HOLOGRAM_COLORS.sphere.gradient.start}, ${HOLOGRAM_COLORS.sphere.gradient.end})`,
+									`linear-gradient(135deg, ${COLORS.sphere.gradient.start}, ${COLORS.sphere.gradient.end})`,
 									"linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 0.5))",
 								],
 							}
@@ -119,8 +116,8 @@ const ProjectImage = memo(
 			<motion.div
 				className="relative aspect-video rounded-lg overflow-hidden"
 				style={{
-					backgroundColor: HOLOGRAM_COLORS.bg.surface,
-					borderColor: HOLOGRAM_COLORS.border.normal,
+					backgroundColor: COLORS.bg.surface,
+					borderColor: COLORS.border.normal,
 				}}
 				animate={hologramAnimations.glow.animate}
 				transition={hologramAnimations.glow.transition}
@@ -137,10 +134,7 @@ const ProjectImage = memo(
 				/>
 			</motion.div>
 			{image.description && (
-				<p
-					className="text-sm font-mono"
-					style={{ color: HOLOGRAM_COLORS.text.muted }}
-				>
+				<p className="text-sm font-mono" style={{ color: COLORS.text.muted }}>
 					<TypewriterText
 						text={image.description}
 						delay={baseDelay + index * 150}
@@ -179,7 +173,7 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 						initial={{ opacity: 0, x: -20 }}
 						animate={{ opacity: 1, x: 0 }}
 						className="w-2/5 h-full flex flex-col relative border-r"
-						style={{ borderColor: HOLOGRAM_COLORS.border.normal }}
+						style={{ borderColor: COLORS.border.normal }}
 					>
 						<div className="h-full overflow-y-auto p-8 custom-scrollbar">
 							<div className="space-y-6">
@@ -187,7 +181,7 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
 									className="text-3xl font-mono font-bold"
-									style={{ color: HOLOGRAM_COLORS.text.primary }}
+									style={{ color: COLORS.text.primary }}
 								>
 									<TypewriterText
 										text={project.title}
@@ -201,8 +195,8 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 									transition={{ delay: ANIMATION_SEQUENCE.description / 1000 }}
 									className="text-lg leading-relaxed font-mono"
 									style={{
-										color: HOLOGRAM_COLORS.text.secondary,
-										textShadow: HOLOGRAM_COLORS.glow.weak,
+										color: COLORS.text.secondary,
+										textShadow: COLORS.glow.weak,
 									}}
 								>
 									<TypewriterText
@@ -219,7 +213,7 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 								>
 									<h3
 										className="font-mono"
-										style={{ color: HOLOGRAM_COLORS.text.primary }}
+										style={{ color: COLORS.text.primary }}
 									>
 										<TypewriterText
 											text="Technologies"

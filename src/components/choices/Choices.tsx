@@ -4,7 +4,7 @@ import { EffectComposer, Grid } from "@react-three/postprocessing";
 import { useState } from "react";
 import { useDialogueStore } from "../../store/dialogue-store";
 import { AnimatedButton } from "./components/AnimatedButton";
-import { buttonPositions } from "./utils/button-states.ts";
+import { buttonPositions } from "./utils/button-states";
 
 export const Choices = () => {
 	const { setCurrentDialogue, currentDialogue } = useDialogueStore();
@@ -14,6 +14,16 @@ export const Choices = () => {
 
 	const handleButtonHover = (buttonId: string, isHovered: boolean) => {
 		setHoveredButton(isHovered ? buttonId : null);
+	};
+
+	const handleButtonClick = (path: string) => {
+		if (currentDialogue?.name === path) {
+			// If clicking the same button, set dialogue to null
+			setCurrentDialogue(null);
+		} else {
+			// If clicking a different button, set the new dialogue
+			setCurrentDialogue(path);
+		}
 	};
 
 	return (
@@ -30,7 +40,7 @@ export const Choices = () => {
 				buttonId="projects"
 				activeButton={activeButton}
 				positions={buttonPositions}
-				onClick={() => setCurrentDialogue("/projects")}
+				onClick={() => handleButtonClick("/projects")}
 				onHover={(isHovered) => handleButtonHover("projects", isHovered)}
 			/>
 
@@ -40,8 +50,8 @@ export const Choices = () => {
 				geometryName="AboutButton"
 				buttonId="about"
 				activeButton={activeButton}
-				positions={buttonPositions} // Using the same positions config
-				onClick={() => setCurrentDialogue("/about")}
+				positions={buttonPositions}
+				onClick={() => handleButtonClick("/about")}
 				onHover={(isHovered) => handleButtonHover("about", isHovered)}
 			/>
 
@@ -51,8 +61,8 @@ export const Choices = () => {
 				geometryName="ContactsButton"
 				buttonId="contacts"
 				activeButton={activeButton}
-				positions={buttonPositions} // Using the same positions config
-				onClick={() => setCurrentDialogue("/contacts")}
+				positions={buttonPositions}
+				onClick={() => handleButtonClick("/contacts")}
 				onHover={(isHovered) => handleButtonHover("contacts", isHovered)}
 			/>
 

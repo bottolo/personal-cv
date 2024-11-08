@@ -1,10 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { NoiseEffect } from "../../global-utils/NoiseEffect.tsx";
-import {
-	HOLOGRAM_COLORS,
-	hologramAnimations,
-} from "../../global-utils/colors.ts";
+import { COLORS, hologramAnimations } from "../../global-utils/colors.ts";
 import { useDialogueStore } from "../../store/dialogue-store.ts";
 import { GlitchContainer } from "./utils/glitch-container.tsx";
 import { GlitchText } from "./utils/glitch-text.tsx";
@@ -88,10 +85,10 @@ const Terminal = () => {
 						<div
 							className="relative backdrop-blur-sm border overflow-hidden"
 							style={{
-								borderColor: HOLOGRAM_COLORS.border.normal,
+								borderColor: COLORS.border.normal,
 								background: `linear-gradient(135deg, 
-                                     ${HOLOGRAM_COLORS.bg.gradient.from}, 
-                                     ${HOLOGRAM_COLORS.bg.gradient.to}
+                                     ${COLORS.bg.gradient.from}, 
+                                     ${COLORS.bg.gradient.to}
                                  )`,
 							}}
 						>
@@ -101,11 +98,11 @@ const Terminal = () => {
 								style={{
 									backgroundImage: `
                                         linear-gradient(to right,
-                                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                                            ${COLORS.grid.line} 1px,
                                             transparent 1px
                                         ),
                                         linear-gradient(to bottom,
-                                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                                            ${COLORS.grid.line} 1px,
                                             transparent 1px
                                         )
                                     `,
@@ -118,8 +115,8 @@ const Terminal = () => {
 								animate={hologramAnimations.glow}
 								className="absolute inset-[-1px] border backdrop-blur-lg -z-10"
 								style={{
-									borderColor: HOLOGRAM_COLORS.border.normal,
-									backgroundColor: HOLOGRAM_COLORS.bg.surface,
+									borderColor: COLORS.border.normal,
+									backgroundColor: COLORS.bg.surface,
 								}}
 							>
 								<NoiseEffect opacity={0.01} />
@@ -128,21 +125,21 @@ const Terminal = () => {
 							<div
 								ref={terminalRef}
 								className="p-4 h-48 overflow-y-auto font-mono custom-scrollbar relative"
-								style={{ color: HOLOGRAM_COLORS.text.secondary }}
+								style={{ color: COLORS.text.secondary }}
 							>
 								<div className="mb-2 flex items-center gap-2">
 									<div>
 										<motion.span
 											animate={{
 												color: [
-													HOLOGRAM_COLORS.text.primary,
-													HOLOGRAM_COLORS.text.secondary,
-													HOLOGRAM_COLORS.text.primary,
+													COLORS.text.primary,
+													COLORS.text.secondary,
+													COLORS.text.primary,
 												],
 												textShadow: [
-													HOLOGRAM_COLORS.glow.weak,
-													HOLOGRAM_COLORS.glow.medium,
-													HOLOGRAM_COLORS.glow.weak,
+													COLORS.glow.weak,
+													COLORS.glow.medium,
+													COLORS.glow.weak,
 												],
 											}}
 											transition={{
@@ -153,18 +150,18 @@ const Terminal = () => {
 										>
 											guest
 										</motion.span>
-										<span style={{ color: HOLOGRAM_COLORS.text.muted }}>@</span>
+										<span style={{ color: COLORS.text.muted }}>@</span>
 										<motion.span
 											animate={{
 												color: [
-													HOLOGRAM_COLORS.text.primary,
-													HOLOGRAM_COLORS.text.secondary,
-													HOLOGRAM_COLORS.text.primary,
+													COLORS.text.primary,
+													COLORS.text.secondary,
+													COLORS.text.primary,
 												],
 												textShadow: [
-													HOLOGRAM_COLORS.glow.weak,
-													HOLOGRAM_COLORS.glow.medium,
-													HOLOGRAM_COLORS.glow.weak,
+													COLORS.glow.weak,
+													COLORS.glow.medium,
+													COLORS.glow.weak,
 												],
 											}}
 											transition={{
@@ -176,9 +173,7 @@ const Terminal = () => {
 										>
 											terminal
 										</motion.span>
-										<span style={{ color: HOLOGRAM_COLORS.text.muted }}>
-											:~${" "}
-										</span>
+										<span style={{ color: COLORS.text.muted }}>:~$ </span>
 									</div>
 								</div>
 
@@ -186,9 +181,9 @@ const Terminal = () => {
 									<motion.span
 										animate={{
 											textShadow: [
-												HOLOGRAM_COLORS.glow.weak,
-												HOLOGRAM_COLORS.glow.medium,
-												HOLOGRAM_COLORS.glow.weak,
+												COLORS.glow.weak,
+												COLORS.glow.medium,
+												COLORS.glow.weak,
 											],
 										}}
 										transition={hologramAnimations.glow.transition}
@@ -200,9 +195,9 @@ const Terminal = () => {
 											animate={{
 												opacity: [1, 0],
 												boxShadow: [
-													HOLOGRAM_COLORS.glow.weak,
-													HOLOGRAM_COLORS.glow.medium,
-													HOLOGRAM_COLORS.glow.weak,
+													COLORS.glow.weak,
+													COLORS.glow.medium,
+													COLORS.glow.weak,
 												],
 											}}
 											transition={{
@@ -213,7 +208,7 @@ const Terminal = () => {
 												boxShadow: hologramAnimations.glow.transition,
 											}}
 											className="absolute ml-1"
-											style={{ color: HOLOGRAM_COLORS.text.primary }}
+											style={{ color: COLORS.text.primary }}
 										>
 											▊
 										</motion.span>
@@ -225,7 +220,7 @@ const Terminal = () => {
 										initial={{ opacity: 0 }}
 										animate={hologramAnimations.pulse.animate}
 										className="text-sm mt-2"
-										style={{ color: HOLOGRAM_COLORS.text.muted }}
+										style={{ color: COLORS.text.muted }}
 									>
 										Press Enter to continue...
 									</motion.div>
@@ -241,7 +236,7 @@ const Terminal = () => {
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.3 }}
 								className="absolute bottom-2 right-2 text-[0.55rem] font-mono"
-								style={{ color: HOLOGRAM_COLORS.text.muted }}
+								style={{ color: COLORS.text.muted }}
 							>
 								{isGlitching ? (
 									<GlitchText text={currentWord} />
@@ -249,9 +244,9 @@ const Terminal = () => {
 									<motion.span
 										animate={{
 											textShadow: [
-												HOLOGRAM_COLORS.glow.weak,
-												HOLOGRAM_COLORS.glow.medium,
-												HOLOGRAM_COLORS.glow.weak,
+												COLORS.glow.weak,
+												COLORS.glow.medium,
+												COLORS.glow.weak,
 											],
 										}}
 										transition={hologramAnimations.glow.transition}

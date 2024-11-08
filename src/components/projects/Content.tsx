@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { HOLOGRAM_COLORS } from "../../global-utils/colors.ts";
+import { COLORS } from "../../global-utils/colors.ts";
 import { useDialogueStore } from "../../store/dialogue-store.ts";
 import Terminal from "../terminal/Terminal.tsx";
 import { Header } from "./components/Header.tsx";
@@ -9,20 +9,16 @@ import Projects from "./components/Projects.tsx";
 const containerAnimations = {
 	initial: {
 		opacity: 0,
-		borderColor: HOLOGRAM_COLORS.border.normal,
+		borderColor: COLORS.border.normal,
 	},
 	animate: {
 		opacity: 1,
-		borderColor: HOLOGRAM_COLORS.border.normal,
-		boxShadow: [
-			HOLOGRAM_COLORS.glow.weak,
-			HOLOGRAM_COLORS.glow.medium,
-			HOLOGRAM_COLORS.glow.weak,
-		],
+		borderColor: COLORS.border.normal,
+		boxShadow: [COLORS.glow.weak, COLORS.glow.medium, COLORS.glow.weak],
 	},
 	exit: {
 		opacity: 0,
-		borderColor: HOLOGRAM_COLORS.border.normal,
+		borderColor: COLORS.border.normal,
 	},
 };
 
@@ -47,8 +43,8 @@ const scanLineTransition = {
 
 const gridOverlayStyle = {
 	backgroundImage: `
-    linear-gradient(to right, ${HOLOGRAM_COLORS.grid.line} 1px, transparent 1px),
-    linear-gradient(to bottom, ${HOLOGRAM_COLORS.grid.line} 1px, transparent 1px)
+    linear-gradient(to right, ${COLORS.grid.line} 1px, transparent 1px),
+    linear-gradient(to bottom, ${COLORS.grid.line} 1px, transparent 1px)
   `,
 	backgroundSize: "20px 20px",
 	opacity: 0.5,
@@ -121,7 +117,7 @@ const Content = () => {
 	const containerStyle = useMemo(
 		() => ({
 			zIndex: 1,
-			backgroundColor: HOLOGRAM_COLORS.bg.surface,
+			backgroundColor: COLORS.bg.surface,
 			borderWidth: "1px",
 			borderStyle: "solid",
 			backdropFilter: "blur(8px)",
@@ -158,7 +154,7 @@ const Content = () => {
 					style={{
 						background: `linear-gradient(to bottom,
               transparent,
-              ${HOLOGRAM_COLORS.effects.scanLine},
+              ${COLORS.effects.scanLine},
               transparent
             )`,
 						height: "1rem",
@@ -194,7 +190,7 @@ const Content = () => {
 					<div
 						className="shrink-0"
 						style={{
-							borderTop: `1px solid ${HOLOGRAM_COLORS.border.normal}`,
+							borderTop: `1px solid ${COLORS.border.normal}`,
 						}}
 					>
 						<Terminal />

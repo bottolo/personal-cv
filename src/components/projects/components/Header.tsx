@@ -1,9 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import {
-	HOLOGRAM_COLORS,
-	hologramAnimations,
-} from "../../../global-utils/colors.ts";
+import { COLORS, hologramAnimations } from "../../../global-utils/colors.ts";
 import { GlitchAvatar } from "./GlitchAvatar";
 
 export const Header = () => {
@@ -54,15 +51,15 @@ export const Header = () => {
 		<motion.div
 			className="w-full flex relative overflow-hidden"
 			style={{
-				backgroundColor: HOLOGRAM_COLORS.bg.surface,
-				borderBottom: `1px solid ${HOLOGRAM_COLORS.border.normal}`,
+				backgroundColor: COLORS.bg.surface,
+				borderBottom: `1px solid ${COLORS.border.normal}`,
 			}}
-			initial={{ borderColor: HOLOGRAM_COLORS.border.normal }}
+			initial={{ borderColor: COLORS.border.normal }}
 			animate={{
 				borderColor: [
-					HOLOGRAM_COLORS.border.normal,
-					HOLOGRAM_COLORS.border.hover,
-					HOLOGRAM_COLORS.border.normal,
+					COLORS.border.normal,
+					COLORS.border.hover,
+					COLORS.border.normal,
 				],
 			}}
 			transition={{
@@ -78,7 +75,7 @@ export const Header = () => {
 				className="absolute inset-0 pointer-events-none"
 				style={{
 					background: `radial-gradient(circle at 50% 50%, 
-                        ${HOLOGRAM_COLORS.effects.particles}, 
+                        ${COLORS.effects.particles}, 
                         transparent 70%
                     )`,
 				}}
@@ -92,11 +89,11 @@ export const Header = () => {
 				style={{
 					backgroundImage: `
                         linear-gradient(to right, 
-                            ${HOLOGRAM_COLORS.effects.grid.line} 1px, 
+                            ${COLORS.effects.grid.line} 1px, 
                             transparent 1px
                         ),
                         linear-gradient(to bottom, 
-                            ${HOLOGRAM_COLORS.effects.grid.line} 1px, 
+                            ${COLORS.effects.grid.line} 1px, 
                             transparent 1px
                         )
                     `,
@@ -120,7 +117,7 @@ export const Header = () => {
 					className="absolute inset-0 pointer-events-none"
 					style={{
 						background: `radial-gradient(circle at center,
-                            ${HOLOGRAM_COLORS.glow.weak},
+                            ${COLORS.glow.weak},
                             transparent 70%
                         )`,
 					}}
@@ -140,12 +137,12 @@ export const Header = () => {
 						<linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
 							<stop
 								offset="0%"
-								stopColor={HOLOGRAM_COLORS.sphere.gradient.start}
+								stopColor={COLORS.sphere.gradient.start}
 								stopOpacity="0.8"
 							/>
 							<stop
 								offset="100%"
-								stopColor={HOLOGRAM_COLORS.sphere.gradient.end}
+								stopColor={COLORS.sphere.gradient.end}
 								stopOpacity="0.3"
 							/>
 						</linearGradient>
@@ -155,7 +152,7 @@ export const Header = () => {
 						d={generateWavePath()}
 						fill="url(#waveGradient)"
 						style={{
-							filter: `drop-shadow(0 0 8px ${HOLOGRAM_COLORS.glow.weak})`,
+							filter: `drop-shadow(0 0 8px ${COLORS.glow.weak})`,
 						}}
 					/>
 
@@ -169,7 +166,7 @@ export const Header = () => {
 								key={i}
 								d={generateWavePath()}
 								fill="none"
-								stroke={HOLOGRAM_COLORS.text.secondary}
+								stroke={COLORS.text.secondary}
 								strokeWidth="0.5"
 								strokeOpacity={0.3 - i * 0.1}
 								transform={`translate(0, ${i * 5})`}
@@ -184,7 +181,7 @@ export const Header = () => {
 					style={{
 						background: `linear-gradient(90deg,
                             transparent,
-                            ${HOLOGRAM_COLORS.effects.glitch.overlay},
+                            ${COLORS.effects.glitch.overlay},
                             transparent
                         )`,
 					}}

@@ -3,10 +3,7 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NoiseEffect } from "../../../../global-utils/NoiseEffect.tsx";
 import { cn } from "../../../../global-utils/cn.ts";
-import {
-	HOLOGRAM_COLORS,
-	hologramAnimations,
-} from "../../../../global-utils/colors.ts";
+import { COLORS, hologramAnimations } from "../../../../global-utils/colors.ts";
 import type { Position } from "../../../../global-utils/position.ts";
 
 // Types and Interfaces
@@ -60,8 +57,8 @@ type ActiveText = TextConfig & { readonly id: number };
 
 // Default Configurations
 const DEFAULT_VISUAL_CONFIG: Required<VisualConfig> = {
-	baseColor: HOLOGRAM_COLORS.text.primary,
-	glowColor: HOLOGRAM_COLORS.primary,
+	baseColor: COLORS.text.primary,
+	glowColor: COLORS.primary,
 	bloomIntensity: 0.4,
 	noiseOpacity: 0.1,
 } as const;
@@ -155,11 +152,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
 			animate={{
 				opacity: 1,
 				y: 0,
-				textShadow: [
-					HOLOGRAM_COLORS.glow.weak,
-					HOLOGRAM_COLORS.glow.medium,
-					HOLOGRAM_COLORS.glow.weak,
-				],
+				textShadow: [COLORS.glow.weak, COLORS.glow.medium, COLORS.glow.weak],
 			}}
 			exit={{ opacity: 0, y: -20 }}
 			transition={{
@@ -258,21 +251,21 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 			<AnimatePresence mode="popLayout">
 				{activeTexts.map(({ id, text, depth, position }) => {
 					const depthStyle = depthStyles[depth];
-					let baseColor = HOLOGRAM_COLORS.text.primary;
-					let glowEffect = HOLOGRAM_COLORS.glow.weak;
+					let baseColor = COLORS.text.primary;
+					let glowEffect = COLORS.glow.weak;
 
 					switch (depth) {
 						case "near":
-							baseColor = HOLOGRAM_COLORS.text.primary;
-							glowEffect = HOLOGRAM_COLORS.glow.strong;
+							baseColor = COLORS.text.primary;
+							glowEffect = COLORS.glow.strong;
 							break;
 						case "mid":
-							baseColor = HOLOGRAM_COLORS.text.secondary;
-							glowEffect = HOLOGRAM_COLORS.glow.medium;
+							baseColor = COLORS.text.secondary;
+							glowEffect = COLORS.glow.medium;
 							break;
 						case "far":
-							baseColor = HOLOGRAM_COLORS.text.muted;
-							glowEffect = HOLOGRAM_COLORS.glow.weak;
+							baseColor = COLORS.text.muted;
+							glowEffect = COLORS.glow.weak;
 							break;
 					}
 
@@ -294,7 +287,7 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 								fontSize: depthStyle.fontSize,
 								textShadow: glowEffect,
 								background: `linear-gradient(135deg,
-                                    ${HOLOGRAM_COLORS.effects.glitch.overlay},
+                                    ${COLORS.effects.glitch.overlay},
                                     transparent)`,
 								backgroundClip: "text",
 								WebkitBackgroundClip: "text",
@@ -309,8 +302,8 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 				className="absolute inset-0 pointer-events-none"
 				style={{
 					backgroundImage: `
-                        linear-gradient(to right, ${HOLOGRAM_COLORS.grid.line} 1px, transparent 1px),
-                        linear-gradient(to bottom, ${HOLOGRAM_COLORS.grid.line} 1px, transparent 1px)
+                        linear-gradient(to right, ${COLORS.grid.line} 1px, transparent 1px),
+                        linear-gradient(to bottom, ${COLORS.grid.line} 1px, transparent 1px)
                     `,
 					backgroundSize: "20px 20px",
 					opacity: 0.2,
@@ -323,7 +316,7 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 				style={{
 					background: `linear-gradient(to bottom,
                         transparent,
-                        ${HOLOGRAM_COLORS.effects.scanLine},
+                        ${COLORS.effects.scanLine},
                         transparent
                     )`,
 					height: "2px",

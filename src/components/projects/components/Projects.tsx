@@ -2,10 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { NoiseEffect } from "../../../global-utils/NoiseEffect.tsx";
 import { cn } from "../../../global-utils/cn.ts";
-import {
-	HOLOGRAM_COLORS,
-	hologramAnimations,
-} from "../../../global-utils/colors.ts";
+import { COLORS, hologramAnimations } from "../../../global-utils/colors.ts";
 import type { Position } from "../../../global-utils/position.ts";
 import { PROJECTS, type Project } from "../utils/projects.ts";
 import Details from "./Details.tsx";
@@ -28,16 +25,16 @@ const staticStyles = {
 
 const sphereStyles = {
 	normal: {
-		background: `linear-gradient(135deg, ${HOLOGRAM_COLORS.sphere.gradient.start}, ${HOLOGRAM_COLORS.sphere.gradient.end})`,
-		boxShadow: `0 5px 15px ${HOLOGRAM_COLORS.sphere.glow.outer},
-                    inset -2px -2px 6px ${HOLOGRAM_COLORS.sphere.glow.inner},
-                    inset 2px 2px 6px ${HOLOGRAM_COLORS.sphere.highlight}`,
+		background: `linear-gradient(135deg, ${COLORS.sphere.gradient.start}, ${COLORS.sphere.gradient.end})`,
+		boxShadow: `0 5px 15px ${COLORS.sphere.glow.outer},
+                    inset -2px -2px 6px ${COLORS.sphere.glow.inner},
+                    inset 2px 2px 6px ${COLORS.sphere.highlight}`,
 	},
 	hovered: {
-		background: HOLOGRAM_COLORS.primary,
-		boxShadow: `0 10px 30px ${HOLOGRAM_COLORS.sphere.glow.outer},
-                    inset -2px -2px 10px ${HOLOGRAM_COLORS.sphere.glow.inner},
-                    inset 2px 2px 10px ${HOLOGRAM_COLORS.sphere.highlight}`,
+		background: COLORS.primary,
+		boxShadow: `0 10px 30px ${COLORS.sphere.glow.outer},
+                    inset -2px -2px 10px ${COLORS.sphere.glow.inner},
+                    inset 2px 2px 10px ${COLORS.sphere.highlight}`,
 	},
 } as const;
 
@@ -105,7 +102,7 @@ const Sphere = memo(
 					className="absolute inset-0 rounded-full pointer-events-none"
 					style={{
 						background: `radial-gradient(circle at center,
-                        ${HOLOGRAM_COLORS.glow.weak},
+                        ${COLORS.glow.weak},
                         transparent 70%
                     )`,
 						opacity: isHovered ? 0.8 : 0.4,
@@ -123,8 +120,8 @@ const Sphere = memo(
 					<motion.span
 						className={staticStyles.sphereText}
 						style={{
-							color: HOLOGRAM_COLORS.text.primary,
-							textShadow: `0 0 10px ${HOLOGRAM_COLORS.glow.medium}`,
+							color: COLORS.text.primary,
+							textShadow: `0 0 10px ${COLORS.glow.medium}`,
 						}}
 						initial={{ opacity: 0, scale: 0.8 }}
 						animate={{
@@ -143,7 +140,7 @@ const Sphere = memo(
 						className="absolute inset-0 pointer-events-none"
 						style={{
 							background: `radial-gradient(circle at 50% 50%,
-                            ${HOLOGRAM_COLORS.effects.particles},
+                            ${COLORS.effects.particles},
                             transparent 70%
                         )`,
 						}}
@@ -205,7 +202,7 @@ const Projects = () => {
 				<motion.div
 					animate={hologramAnimations.pulse.animate}
 					transition={hologramAnimations.pulse.transition}
-					style={{ color: HOLOGRAM_COLORS.text.secondary }}
+					style={{ color: COLORS.text.secondary }}
 					className={staticStyles.loadingText}
 				>
 					Loading...
@@ -232,11 +229,11 @@ const Projects = () => {
 				style={{
 					backgroundImage: `
                         linear-gradient(to right,
-                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                            ${COLORS.grid.line} 1px,
                             transparent 1px
                         ),
                         linear-gradient(to bottom,
-                            ${HOLOGRAM_COLORS.grid.line} 1px,
+                            ${COLORS.grid.line} 1px,
                             transparent 1px
                         )
                     `,

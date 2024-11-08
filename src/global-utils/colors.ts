@@ -1,4 +1,4 @@
-export const HOLOGRAM_COLORS = {
+export const COLORS = {
 	// Base colors
 	primary: "rgb(59, 130, 246)", // blue-400
 	accent: "rgb(165, 243, 252)", // cyan-200
@@ -78,11 +78,7 @@ export const HOLOGRAM_COLORS = {
 export const hologramAnimations = {
 	glow: {
 		animate: {
-			boxShadow: [
-				HOLOGRAM_COLORS.glow.weak,
-				HOLOGRAM_COLORS.glow.medium,
-				HOLOGRAM_COLORS.glow.weak,
-			],
+			boxShadow: [COLORS.glow.weak, COLORS.glow.medium, COLORS.glow.weak],
 		},
 		transition: {
 			duration: 2,

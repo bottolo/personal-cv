@@ -1,7 +1,7 @@
 import { useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { HOLOGRAM_COLORS } from "../../../../../global-utils/colors.ts";
+import { COLORS } from "../../../../../global-utils/colors.ts";
 import { useDialogueStore } from "../../../../../store/dialogue-store.ts";
 
 const CAMERA_POSITIONS = {
@@ -54,8 +54,8 @@ export const CameraController = () => {
 				interferenceRef.current.style.backgroundImage = `
                     repeating-linear-gradient(
                         0deg,
-                        ${HOLOGRAM_COLORS.effects.scanLine} 0px,
-                        ${HOLOGRAM_COLORS.effects.scanLine} 1px,
+                        ${COLORS.effects.scanLine} 0px,
+                        ${COLORS.effects.scanLine} 1px,
                         transparent 2px,
                         transparent 4px
                     )
