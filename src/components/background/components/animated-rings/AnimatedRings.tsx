@@ -7,21 +7,12 @@ import {
 	Scanline,
 } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize, Resolution } from "postprocessing";
-import {
-	Suspense,
-	memo,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Vector2 } from "three";
 import { cn } from "../../../../global-utils/cn.ts";
 import { COLORS } from "../../../../global-utils/colors.ts";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
-import { CameraController } from "./components/CameraController.tsx";
-import { RingScene } from "./components/RingScene.tsx";
+import { SceneManager } from "../scenes/SceneManager.tsx";
 
 // Configurations with proper types
 const CAMERA_CONFIG = {
@@ -79,11 +70,6 @@ const createEffectConfigs = (isActive: boolean) => ({
 	},
 });
 
-// Memoized components
-const MemoizedRingScene = memo(RingScene);
-const MemoizedCameraController = memo(CameraController);
-
-// Effects component with proper types
 const Effects = memo(({ isGlitchActive }: { isGlitchActive: boolean }) => {
 	const configs = useMemo(
 		() => createEffectConfigs(isGlitchActive),
@@ -102,22 +88,11 @@ const Effects = memo(({ isGlitchActive }: { isGlitchActive: boolean }) => {
 
 Effects.displayName = "Effects";
 
-const Scene = memo(() => (
-	<Suspense fallback={null}>
-		<color attach="background" args={[COLORS.palette.blue.dark]} />
-		<fog attach="fog" args={[COLORS.palette.purple.dark, 5, 30]} />
-		<MemoizedRingScene />
-		<MemoizedCameraController />
-	</Suspense>
-));
-
-Scene.displayName = "Scene";
-
 interface AnimatedRingsProps {
 	className?: string;
 }
 
-const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
+export const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
 	const glitchTimeoutRef = useRef<number>();
 	const { currentDialogue } = useDialogueStore();
 	const [isGlitchActive, setIsGlitchActive] = useState(false);
@@ -130,7 +105,6 @@ const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
 	const handleGlitchEffect = useCallback(() => {
 		setIsGlitchActive(true);
 		window.clearTimeout(glitchTimeoutRef.current);
-
 		glitchTimeoutRef.current = window.setTimeout(() => {
 			setIsGlitchActive(false);
 		}, 200);
@@ -144,13 +118,10 @@ const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
 	return (
 		<div className={containerClassName}>
 			<Canvas camera={CAMERA_CONFIG} {...CANVAS_CONFIG}>
-				<Scene />
+				<color attach="background" args={[COLORS.palette.blue.dark]} />
+				<SceneManager />
 				<Effects isGlitchActive={isGlitchActive} />
 			</Canvas>
 		</div>
 	);
 });
-
-AnimatedRings.displayName = "AnimatedRings";
-
-export { AnimatedRings };

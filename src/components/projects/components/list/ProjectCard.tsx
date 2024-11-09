@@ -57,7 +57,7 @@ export const ProjectCard = memo(
 					}}
 					animate={{
 						scale: isHovered ? 1.05 : 1,
-						borderRadius: isHovered ? "1.5rem" : "1rem",
+						borderRadius: isHovered ? "1rem" : "0rem",
 					}}
 					transition={{
 						scale: { duration: 0.3 },
@@ -155,7 +155,7 @@ export const ProjectCard = memo(
 
 					{/* Border glow */}
 					<motion.div
-						className="absolute inset-0 rounded-2xl pointer-events-none"
+						className="absolute inset-0 rounded-none pointer-events-none"
 						style={{
 							border: `1px solid ${project.color || COLORS.palette.blue.primary}40`,
 						}}

@@ -60,7 +60,7 @@ const Projects = () => {
 				</p>
 			)}
 
-			<NoiseEffect opacity={0.02} />
+			<NoiseEffect opacity={0.005} />
 
 			{/* Grid background */}
 			<div

@@ -3,7 +3,6 @@ import { AnimatedRings } from "./components/animated-rings/AnimatedRings.tsx";
 import { GlitchyTextPool } from "./components/animated-text/GlitchyTextPool.tsx";
 import { GridOverlay } from "./components/grid-overlay/GridOverlay.tsx";
 
-// Move text pool outside component to prevent recreation on each render
 const TEXT_POOL = [
 	"something is out there",
 	"something is happening",
@@ -25,13 +24,11 @@ const TEXT_POOL = [
 	"look at us",
 ] as const;
 
-// Memoize static components
 const MemoizedGridOverlay = memo(GridOverlay);
 const MemoizedAnimatedRings = memo(AnimatedRings);
 const MemoizedGlitchyTextPool = memo(GlitchyTextPool);
 
 export const Background = memo(() => {
-	// Memoize the rings className to prevent recreation
 	const ringsClassName = useMemo(() => "fixed h-full w-full z-[-1]", []);
 
 	return (
@@ -43,10 +40,8 @@ export const Background = memo(() => {
 	);
 });
 
-// Add display name for debugging
 Background.displayName = "Background";
 
-// If you need to use the component with dynamic props, create a separate version
 export const DynamicBackground = memo(
 	({ customTextPool }: { customTextPool?: readonly string[] }) => {
 		const ringsClassName = useMemo(() => "fixed h-full w-full z-[-1]", []);
