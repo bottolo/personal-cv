@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { COLORS, hologramAnimations } from "../../../global-utils/colors";
+import { COLORS, hologramAnimations } from "../../../../global-utils/colors.ts";
 import GlitchAvatar from "./GlitchAvatar.tsx";
 
 export const Header = () => {

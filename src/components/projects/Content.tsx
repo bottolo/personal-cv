@@ -9,8 +9,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { COLORS } from "../../global-utils/colors.ts";
 import { useDialogueStore } from "../../store/dialogue-store.ts";
 import Terminal from "../terminal/Terminal.tsx";
-import { Header } from "./components/Header.tsx";
-import Projects from "./components/Projects.tsx";
+import { Header } from "./components/header/Header.tsx";
+import Projects from "./components/list/Projects.tsx";
 
 interface Dimensions {
 	width: number;

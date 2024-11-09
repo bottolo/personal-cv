@@ -1,8 +1,8 @@
 import { motion, useAnimationControls } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { NoiseEffect } from "../../../global-utils/NoiseEffect.tsx";
-import { COLORS, hologramAnimations } from "../../../global-utils/colors.ts";
-import type { Project } from "../utils/projects.ts";
+import { NoiseEffect } from "../../../../global-utils/NoiseEffect.tsx";
+import { COLORS, hologramAnimations } from "../../../../global-utils/colors.ts";
+import type { Project } from "../../utils/projects.ts";
 
 interface ProjectLinks {
 	github?: string;
