@@ -10,6 +10,19 @@ interface TiltProps {
 	children: React.ReactNode;
 }
 
+interface ContainerStyle {
+	perspective: number;
+	rotateX: ReturnType<typeof useSpring>;
+	rotateY: ReturnType<typeof useSpring>;
+	transform: string;
+}
+
+interface ContentStyle {
+	scale: number;
+	transform: string;
+	background: string;
+}
+
 const TiltContainer = ({ children }: TiltProps) => {
 	const mouseX = useMotionValue(0);
 	const mouseY = useMotionValue(0);
@@ -39,11 +52,7 @@ const TiltContainer = ({ children }: TiltProps) => {
 	}, []);
 
 	const handleMouseMove = useCallback(
-		(e: {
-			currentTarget: { getBoundingClientRect: () => any };
-			clientX: number;
-			clientY: number;
-		}) => {
+		(e: React.MouseEvent<HTMLDivElement>) => {
 			const rect = e.currentTarget.getBoundingClientRect();
 
 			const centerX = rect.left + rect.width / 2;
@@ -61,8 +70,8 @@ const TiltContainer = ({ children }: TiltProps) => {
 	);
 
 	const handleMouseLeave = useCallback(() => {
-		mouseX.set(0, true);
-		mouseY.set(0, true);
+		mouseX.set(0);
+		mouseY.set(0);
 	}, [mouseX, mouseY]);
 
 	const containerStyle = useMemo(
@@ -70,7 +79,7 @@ const TiltContainer = ({ children }: TiltProps) => {
 			perspective: 500,
 			rotateX,
 			rotateY,
-			transformStyle: "preserve-3d",
+			transform: "preserve-3d",
 		}),
 		[rotateX, rotateY],
 	);
@@ -78,12 +87,43 @@ const TiltContainer = ({ children }: TiltProps) => {
 	const contentStyle = useMemo(
 		() => ({
 			scale: 1.0,
-			transformStyle: "preserve-3d",
+			transform: "preserve-3d",
 			background: createHologramGradient(
 				"135deg",
 				COLORS.palette.blue.primary,
-				[".05", ".02"],
+				[0.05, 0.02], // Fixed: Changed strings to numbers
 			),
+		}),
+		[],
+	);
+
+	const gridStyle = useMemo(
+		() => ({
+			backgroundImage: `
+                linear-gradient(to right, ${COLORS.grid.line} 1px, transparent 1px),
+                linear-gradient(to bottom, ${COLORS.grid.line} 1px, transparent 1px)
+            `,
+			backgroundSize: "20px 20px",
+			opacity: 0.5,
+		}),
+		[],
+	);
+
+	const particleStyle = useMemo(
+		() => ({
+			background: `radial-gradient(circle at 50% 50%, ${COLORS.effects.particles}, transparent 70%)`,
+		}),
+		[],
+	);
+
+	const scanLineStyle = useMemo(
+		() => ({
+			background: createHologramGradient(
+				"180deg",
+				COLORS.effects.scanLine,
+				[0.3, 0], // Fixed: Changed strings to numbers
+			),
+			height: "10%",
 		}),
 		[],
 	);
@@ -91,24 +131,12 @@ const TiltContainer = ({ children }: TiltProps) => {
 	return (
 		<div className="fixed inset-0 w-screen h-screen overflow-hidden cursor-none">
 			{/* Grid overlay */}
-			<div
-				className="absolute inset-0 pointer-events-none"
-				style={{
-					backgroundImage: `
-                        linear-gradient(to right, ${COLORS.grid.line} 1px, transparent 1px),
-                        linear-gradient(to bottom, ${COLORS.grid.line} 1px, transparent 1px)
-                    `,
-					backgroundSize: "20px 20px",
-					opacity: 0.5,
-				}}
-			/>
+			<div className="absolute inset-0 pointer-events-none" style={gridStyle} />
 
 			{/* Particle effect */}
 			<motion.div
 				className="absolute inset-0 pointer-events-none"
-				style={{
-					background: `radial-gradient(circle at 50% 50%, ${COLORS.effects.particles}, transparent 70%)`,
-				}}
+				style={particleStyle}
 				animate={hologramAnimations.pulse.animate}
 				transition={hologramAnimations.pulse.transition}
 			/>
@@ -120,11 +148,11 @@ const TiltContainer = ({ children }: TiltProps) => {
 				className="relative w-full h-full bg-transparent z-0"
 			>
 				<motion.div
-					style={containerStyle}
+					style={containerStyle as ContainerStyle}
 					className="w-full h-full bg-transparent rounded-md cursor-none"
 				>
 					<motion.div
-						style={contentStyle}
+						style={contentStyle as ContentStyle}
 						className="w-full h-full origin-center"
 					>
 						{children}
@@ -135,14 +163,7 @@ const TiltContainer = ({ children }: TiltProps) => {
 			{/* Scan line effect */}
 			<motion.div
 				className="absolute inset-0 pointer-events-none"
-				style={{
-					background: createHologramGradient(
-						"180deg",
-						COLORS.effects.scanLine,
-						[".3", "0"],
-					),
-					height: "10%",
-				}}
+				style={scanLineStyle}
 				animate={hologramAnimations.scan.animate}
 				transition={hologramAnimations.scan.transition}
 			/>

@@ -35,6 +35,7 @@ interface HalottoloProps extends GroupProps {
 	materialOptions?: MaterialOptions;
 	rotationOptions?: RotationOptions;
 	scale?: number;
+	path?: string;
 }
 
 const defaultMaterialOptions: MaterialOptions = {
@@ -52,9 +53,10 @@ export function Halottolo({
 	materialOptions = defaultMaterialOptions,
 	rotationOptions = defaultRotationOptions,
 	scale = 1,
+	path = `${import.meta.env.BASE_URL}halottolo.glb`,
 	...props
 }: HalottoloProps) {
-	const { nodes } = useGLTF("/halottolo.glb") as GLTFResult;
+	const { nodes } = useGLTF(path) as GLTFResult;
 	const groupRef = useRef<THREE.Group>(null);
 
 	const material = useMemo(() => {
@@ -180,4 +182,4 @@ export function Halottolo({
 	);
 }
 
-useGLTF.preload("/halottolo.glb");
+useGLTF.preload(`${import.meta.env.BASE_URL}halottolo.glb`);

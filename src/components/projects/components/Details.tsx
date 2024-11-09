@@ -1,8 +1,17 @@
 import { motion, useAnimationControls } from "framer-motion";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { NoiseEffect } from "../../../global-utils/NoiseEffect.tsx";
 import { COLORS, hologramAnimations } from "../../../global-utils/colors.ts";
 import type { Project } from "../utils/projects.ts";
+
+interface ProjectLinks {
+	github?: string;
+	live?: string;
+}
+
+interface ProjectWithLinks extends Project {
+	links?: ProjectLinks;
+}
 
 const ANIMATION_SEQUENCE = {
 	title: 0,
@@ -19,9 +28,9 @@ const TypewriterText = memo(
 
 		useEffect(() => {
 			let index = 0;
-			let intervalId: NodeJS.Timeout;
+			let intervalId: number; // Fixed NodeJS.Timeout type
 			const timerId = setTimeout(() => {
-				intervalId = setInterval(() => {
+				intervalId = window.setInterval(() => {
 					if (index < text.length) {
 						setDisplayText((prev) => text.slice(0, prev.length + 1));
 						index++;
@@ -40,6 +49,8 @@ const TypewriterText = memo(
 		return <span>{displayText}</span>;
 	},
 );
+
+TypewriterText.displayName = "TypewriterText";
 
 const MarbleButton = memo(
 	({
@@ -146,7 +157,7 @@ const ProjectImage = memo(
 );
 
 interface DetailsProps {
-	project: Project;
+	project: ProjectWithLinks;
 	onClose: () => void;
 }
 
@@ -157,6 +168,12 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 		controls.start({ opacity: 1 });
 	}, [controls]);
 
+	const handleGithubClick = useCallback(() => {
+		if (project.links?.github) {
+			window.open(project.links.github, "_blank");
+		}
+	}, [project.links?.github]);
+
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
@@ -165,7 +182,6 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 			className="absolute inset-0 flex items-center justify-center"
 			style={{ zIndex: 50 }}
 		>
-			{/* Container remains the same */}
 			<div className="relative w-full h-full bg-gradient-to-br from-blue-950/80 to-purple-950/80 backdrop-blur-sm border border-blue-400/20 overflow-hidden">
 				<div className="relative flex h-full">
 					{/* Left side - Info */}
@@ -189,6 +205,7 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 									/>
 								</motion.h2>
 
+								{/* Description */}
 								<motion.p
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
@@ -205,66 +222,29 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 									/>
 								</motion.p>
 
-								<motion.div
-									className="space-y-2"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									transition={{ delay: ANIMATION_SEQUENCE.techTitle / 1000 }}
-								>
-									<h3
-										className="font-mono"
-										style={{ color: COLORS.text.primary }}
-									>
-										<TypewriterText
-											text="Technologies"
-											delay={ANIMATION_SEQUENCE.techTitle}
-										/>
-									</h3>
-									<div className="flex flex-wrap gap-2">
-										{project.technologies.map((tech, index) => (
-											<motion.div
-												key={tech}
-												initial={{ opacity: 0, scale: 0.8 }}
-												animate={{ opacity: 1, scale: 1 }}
-												transition={{
-													delay:
-														ANIMATION_SEQUENCE.techItems / 1000 + index * 0.1,
-												}}
-											>
-												<MarbleButton
-													onClick={() => {}}
-													className="px-3 py-1 text-sm"
-												>
-													<TypewriterText
-														text={tech}
-														delay={ANIMATION_SEQUENCE.techItems + index * 100}
-													/>
-												</MarbleButton>
-											</motion.div>
-										))}
-									</div>
-								</motion.div>
+								{/* Technologies */}
+								<TechnologiesSection
+									technologies={project.technologies}
+									animationDelay={ANIMATION_SEQUENCE.techTitle}
+								/>
 
-								{project.links && (
+								{/* Links */}
+								{project.links?.github && (
 									<motion.div
 										className="flex gap-4"
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
 										transition={{ delay: ANIMATION_SEQUENCE.links / 1000 }}
 									>
-										{project.links.github && (
-											<MarbleButton
-												onClick={() =>
-													window.open(project?.links.github, "_blank")
-												}
-												className="px-4 py-2 text-sm"
-											>
-												<TypewriterText
-													text="GitHub →"
-													delay={ANIMATION_SEQUENCE.links}
-												/>
-											</MarbleButton>
-										)}
+										<MarbleButton
+											onClick={handleGithubClick}
+											className="px-4 py-2 text-sm"
+										>
+											<TypewriterText
+												text="GitHub →"
+												delay={ANIMATION_SEQUENCE.links}
+											/>
+										</MarbleButton>
 									</motion.div>
 								)}
 							</div>
@@ -276,7 +256,7 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 						<div className="space-y-8">
 							{project.images.map((image, index) => (
 								<ProjectImage
-									key={index}
+									key={image.src}
 									image={image}
 									index={index}
 									baseDelay={ANIMATION_SEQUENCE.images}
@@ -285,35 +265,97 @@ const Details = memo(({ project, onClose }: DetailsProps) => {
 						</div>
 					</div>
 
-					{/* Close button and version text */}
-					<motion.div
-						className="absolute top-2 right-2 text-[0.6rem] font-mono text-blue-300/60"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 0.2 }}
-					>
-						<TypewriterText text={`project[${project.id}].details`} />
-					</motion.div>
-
-					<motion.div
-						className="absolute bottom-2 right-2 flex items-center gap-2"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 0.2 }}
-					>
-						<MarbleButton
-							onClick={onClose}
-							className="w-16 h-8 text-sm"
-							isClose={true}
-						>
-							Close
-						</MarbleButton>
-					</motion.div>
+					{/* Metadata and Controls */}
+					<ProjectMetadata
+						projectId={project.id.toString()}
+						onClose={onClose}
+					/>
 				</div>
 			</div>
 			<NoiseEffect opacity={0.02} />
 		</motion.div>
 	);
 });
+
+// Extracted components for better organization
+const TechnologiesSection = memo(
+	({
+		technologies,
+		animationDelay,
+	}: {
+		technologies: string[];
+		animationDelay: number;
+	}) => (
+		<motion.div
+			className="space-y-2"
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ delay: animationDelay / 1000 }}
+		>
+			<h3 className="font-mono" style={{ color: COLORS.text.primary }}>
+				<TypewriterText text="Technologies" delay={animationDelay} />
+			</h3>
+			<div className="flex flex-wrap gap-2">
+				{technologies.map((tech, index) => (
+					<motion.div
+						key={tech}
+						initial={{ opacity: 0, scale: 0.8 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{
+							delay: ANIMATION_SEQUENCE.techItems / 1000 + index * 0.1,
+						}}
+					>
+						<MarbleButton onClick={() => {}} className="px-3 py-1 text-sm">
+							<TypewriterText
+								text={tech}
+								delay={ANIMATION_SEQUENCE.techItems + index * 100}
+							/>
+						</MarbleButton>
+					</motion.div>
+				))}
+			</div>
+		</motion.div>
+	),
+);
+
+const ProjectMetadata = memo(
+	({
+		projectId,
+		onClose,
+	}: {
+		projectId: string;
+		onClose: () => void;
+	}) => (
+		<>
+			<motion.div
+				className="absolute top-2 right-2 text-[0.6rem] font-mono text-blue-300/60"
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ delay: 0.2 }}
+			>
+				<TypewriterText text={`project[${projectId}].details`} />
+			</motion.div>
+
+			<motion.div
+				className="absolute bottom-2 right-2 flex items-center gap-2"
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ delay: 0.2 }}
+			>
+				<MarbleButton
+					onClick={onClose}
+					className="w-16 h-8 text-sm"
+					isClose={true}
+				>
+					Close
+				</MarbleButton>
+			</motion.div>
+		</>
+	),
+);
+
+Details.displayName = "Details";
+TechnologiesSection.displayName = "TechnologiesSection";
+ProjectMetadata.displayName = "ProjectMetadata";
 
 export default Details;

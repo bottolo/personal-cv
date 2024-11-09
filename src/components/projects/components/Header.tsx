@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { COLORS, hologramAnimations } from "../../../global-utils/colors";
-import { GlitchAvatar } from "./GlitchAvatar";
+import GlitchAvatar from "./GlitchAvatar.tsx";
 
 export const Header = () => {
 	const [phase, setPhase] = useState(0);

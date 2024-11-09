@@ -40,9 +40,10 @@ export function Tetrahedron({
 		[materialOptions],
 	);
 
-	useFrame((state, delta) => {
+	useFrame((_state, delta) => {
 		if (groupRef.current && rotationOptions.axis !== "none") {
-			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
+			const speed =
+				(rotationOptions.speed ?? defaultRotationOptions.speed) || 0.01;
 			groupRef.current.rotation[rotationOptions.axis ?? "y"] += delta * speed;
 		}
 	});

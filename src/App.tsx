@@ -1,5 +1,5 @@
 import { AnimatePresence } from "framer-motion";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DynamicBackground } from "./components/background/Background";
 import { Choices } from "./components/choices/Choices";
 import Cursor from "./components/cursor/Cursor";
@@ -13,28 +13,24 @@ const FADE_DURATION = 0.8;
 const TOTAL_DURATION = 4;
 const TIMER_DURATION = (TOTAL_DURATION - FADE_DURATION) * 1000;
 
-const MainContent = memo(({ currentDialogue }: { currentDialogue: any }) => (
+const MainContent = ({ currentDialogue }) => (
 	<>
 		<DynamicBackground />
 		<Choices />
 		{currentDialogue && <Content />}
 	</>
-));
+);
 
-MainContent.displayName = "MainContent";
-
-const LoadingScreenWrapper = memo(({ isVisible }: { isVisible: boolean }) => (
+const LoadingScreenWrapper = ({ isVisible }) => (
 	<AnimatePresence>{isVisible && <LoadingScreen />}</AnimatePresence>
-));
-
-LoadingScreenWrapper.displayName = "LoadingScreenWrapper";
+);
 
 function App() {
 	const { currentDialogue } = useDialogueStore();
 	const [isMonitorOn, setIsMonitorOn] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const handlePowerChange = useCallback((newState: boolean) => {
+	const handlePowerChange = useCallback((newState) => {
 		setIsMonitorOn(newState);
 	}, []);
 
@@ -45,21 +41,14 @@ function App() {
 				setIsLoading(false);
 			}, TIMER_DURATION);
 			return () => clearTimeout(timer);
-		} else {
-			setIsLoading(false);
 		}
+		setIsLoading(false);
 	}, [isMonitorOn]);
-
-	const isLoadingVisible = useMemo(
-		() => isMonitorOn && isLoading,
-		[isMonitorOn, isLoading],
-	);
 
 	return (
 		<>
 			<TiltContainer>
 				{isMonitorOn && <MainContent currentDialogue={currentDialogue} />}
-				<LoadingScreenWrapper isVisible={isLoadingVisible} />
 			</TiltContainer>
 			<Cursor />
 			<MonitorBorder onPowerChange={handlePowerChange} />
@@ -67,4 +56,4 @@ function App() {
 	);
 }
 
-export default memo(App);
+export default App;

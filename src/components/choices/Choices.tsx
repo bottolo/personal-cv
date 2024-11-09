@@ -10,19 +10,19 @@ const BUTTONS = [
 	{
 		id: "projects",
 		text: "/projects",
-		modelPath: "/projects_button.glb",
+		modelPath: "projects_button.glb",
 		geometryName: "ProjectsButton",
 	},
 	{
 		id: "about",
 		text: "/about",
-		modelPath: "/about_button.glb",
+		modelPath: "about_button.glb",
 		geometryName: "AboutButton",
 	},
 	{
 		id: "contacts",
 		text: "/contacts",
-		modelPath: "/contacts_button.glb",
+		modelPath: "contacts_button.glb",
 		geometryName: "ContactsButton",
 	},
 ] as const;
@@ -54,24 +54,21 @@ const ButtonsContainer = memo(
 	({
 		activeButton,
 		handleButtonClick,
-		handleButtonHover,
 	}: {
 		activeButton: string | null;
 		handleButtonClick: (path: string) => void;
-		handleButtonHover: (buttonId: string, isHovered: boolean) => void;
 	}) => (
 		<>
 			{BUTTONS.map((button) => (
 				<AnimatedButton
 					key={button.id}
 					text={button.text}
-					modelPath={button.modelPath}
+					modelPath={`${import.meta.env.BASE_URL}${button.modelPath}`}
 					geometryName={button.geometryName}
 					buttonId={button.id}
 					activeButton={activeButton}
 					positions={buttonPositions}
 					onClick={() => handleButtonClick(button.text)}
-					onHover={(isHovered) => handleButtonHover(button.id, isHovered)}
 				/>
 			))}
 		</>
@@ -95,14 +92,6 @@ export const Choices = memo(() => {
 		[currentDialogue?.name, setCurrentDialogue],
 	);
 
-	const handleButtonHover = useCallback(
-		(buttonId: string, isHovered: boolean) => {
-			// Consider using a ref if hover state doesn't need to trigger re-renders
-			// or handle hover effects directly in the AnimatedButton component
-		},
-		[],
-	);
-
 	const canvasConfig = useMemo(
 		() => ({
 			shadows: "soft" as const,
@@ -123,7 +112,6 @@ export const Choices = memo(() => {
 			<ButtonsContainer
 				activeButton={activeButton}
 				handleButtonClick={handleButtonClick}
-				handleButtonHover={handleButtonHover}
 			/>
 			<Lights />
 		</Canvas>

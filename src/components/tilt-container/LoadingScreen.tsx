@@ -2,80 +2,36 @@ import { motion } from "framer-motion";
 import { memo } from "react";
 import { COLORS } from "../../global-utils/colors";
 
-const GlowingSphere = memo(() => (
-	<svg viewBox="0 0 200 200" className="w-48 h-48">
-		{/* Glowing effect - outer */}
-		<motion.circle
-			cx="100"
-			cy="100"
-			r="80"
-			fill="none"
-			stroke={COLORS.palette.blue.primary}
-			strokeWidth="1"
-			style={{
-				filter: "blur(4px)",
-			}}
-			animate={{
-				opacity: [0.3, 0.6, 0.3],
-			}}
-			transition={{
-				duration: 2,
-				repeat: Number.POSITIVE_INFINITY,
-				ease: "easeInOut",
-			}}
-		/>
-
-		{/* Main sphere outline */}
-		<circle
-			cx="100"
-			cy="100"
-			r="70"
-			fill="none"
-			stroke={COLORS.palette.blue.primary}
-			strokeWidth="2"
-		/>
-
-		{/* Filling effect */}
-		<motion.circle
-			cx="100"
-			cy="100"
-			r="0"
-			fill={COLORS.palette.blue.primary}
-			initial={{ r: 0 }}
-			animate={{ r: 68 }}
-			transition={{
-				duration: 3,
-				ease: "easeInOut",
-			}}
-			style={{
-				opacity: 0.3,
-			}}
-		/>
-
-		{/* Inner glow */}
-		<motion.circle
-			cx="100"
-			cy="100"
-			r="65"
-			fill="none"
-			stroke={COLORS.effects.glitch.overlay}
-			strokeWidth="4"
-			style={{
-				filter: "blur(8px)",
-			}}
-			animate={{
-				opacity: [0.1, 0.3, 0.1],
-			}}
-			transition={{
-				duration: 1.5,
-				repeat: Number.POSITIVE_INFINITY,
-				ease: "easeInOut",
-			}}
-		/>
-	</svg>
+const RadarRings = memo(() => (
+	<div className="relative w-48 h-48 flex items-center justify-center">
+		{[...Array(5)].map((_, i) => (
+			<motion.div
+				key={i}
+				className="absolute rounded-full"
+				style={{
+					border: `2px solid ${COLORS.palette.blue.primary}`,
+					boxShadow: `0 0 20px ${COLORS.effects.glitch.overlay}`,
+					background: `radial-gradient(circle, ${COLORS.palette.blue.primary}20 0%, transparent 70%)`,
+				}}
+				initial={{ width: 50, height: 50, opacity: 0.8, scale: 0 }}
+				animate={{
+					width: [50, 200],
+					height: [50, 200],
+					opacity: [0.8, 0],
+					scale: [1, 2],
+				}}
+				transition={{
+					duration: 1.5,
+					delay: i * 0.2,
+					ease: "linear",
+					repeat: Number.POSITIVE_INFINITY,
+				}}
+			/>
+		))}
+	</div>
 ));
 
-GlowingSphere.displayName = "GlowingSphere";
+RadarRings.displayName = "RadarRings";
 
 const TypewriterText = memo(({ text }: { text: string }) => (
 	<motion.div
@@ -111,8 +67,8 @@ const LoadingScreen = () => {
 				ease: "easeIn",
 			}}
 		>
-			<TypewriterText text="bottolocv-0.1" />
-			<GlowingSphere />
+			<TypewriterText text="bottolo-cv | v0.1" />
+			<RadarRings />
 		</motion.div>
 	);
 };

@@ -35,7 +35,7 @@ export default function Cursor({
 	}, [defaultColor]);
 
 	return (
-		<motion.div className="fixed inset-0 pointer-events-none z-[9999]">
+		<motion.div className="fixed inset-0 pointer-events-none z-[9999999]">
 			{/* Horizontal line */}
 			<div
 				className="absolute w-full"

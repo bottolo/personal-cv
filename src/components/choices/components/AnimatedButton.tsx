@@ -1,6 +1,7 @@
 import { Text, useGLTF } from "@react-three/drei";
+import type { ThreeEvent } from "@react-three/fiber";
 import { motion } from "framer-motion-3d";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { COLORS } from "../../../global-utils/colors";
 import type { ButtonPositions } from "../utils/button-states";
@@ -24,15 +25,26 @@ const defaultMaterialOptions = {
 	roughness: 0.3,
 } as const;
 
-// Pre-create color instances
+// Pre-create color instances and their hex values
 const colorInstances = {
-	hover: new THREE.Color(COLORS.button.hover),
-	active: new THREE.Color(COLORS.button.active),
-	default: new THREE.Color(COLORS.button.default),
-	inactive: new THREE.Color(COLORS.button.inactive),
+	hover: {
+		color: new THREE.Color(COLORS.button.hover),
+		hex: COLORS.button.hover,
+	},
+	active: {
+		color: new THREE.Color(COLORS.button.active),
+		hex: COLORS.button.active,
+	},
+	default: {
+		color: new THREE.Color(COLORS.button.default),
+		hex: COLORS.button.default,
+	},
+	inactive: {
+		color: new THREE.Color(COLORS.button.inactive),
+		hex: COLORS.button.inactive,
+	},
 } as const;
 
-// Memoize transition config
 const transition = {
 	type: "spring",
 	stiffness: 100,
@@ -40,7 +52,6 @@ const transition = {
 	mass: 0.5,
 } as const;
 
-// Extract opacity values once
 const getOpacity = (color: string) =>
 	color.includes("rgba") ? Number.parseFloat(color.split(",")[3]) : 1;
 
@@ -64,24 +75,40 @@ export const AnimatedButton = ({
 	const { nodes } = useGLTF(modelPath) as ButtonGLTFResult<typeof geometryName>;
 	const isActive = buttonId === activeButton;
 	const [isHovered, setIsHovered] = useState(false);
+	const meshRef = useRef<THREE.Mesh>(null);
 
 	const material = useMemo(() => {
-		const material = new THREE.MeshStandardMaterial({
+		return new THREE.MeshStandardMaterial({
 			color: isActive
-				? colorInstances.active
+				? colorInstances.active.color
 				: !activeButton
-					? colorInstances.default
-					: colorInstances.inactive,
+					? colorInstances.default.color
+					: colorInstances.inactive.color,
 			metalness,
 			roughness,
 			side: THREE.DoubleSide,
 			transparent: true,
 			opacity: !activeButton ? opacityValues.default : opacityValues.inactive,
 		});
-
-		material.needsUpdate = false;
-		return material;
 	}, [isActive, activeButton, metalness, roughness]);
+
+	// Update material color when button state changes
+	useEffect(() => {
+		if (meshRef.current) {
+			const targetColor = isHovered
+				? colorInstances.hover.color
+				: isActive
+					? colorInstances.active.color
+					: !activeButton
+						? colorInstances.default.color
+						: colorInstances.inactive.color;
+
+			const meshMaterial = meshRef.current
+				.material as THREE.MeshStandardMaterial;
+			meshMaterial.color = targetColor;
+			meshMaterial.needsUpdate = true;
+		}
+	}, [isHovered, isActive, activeButton]);
 
 	const textConfig = useMemo(
 		() => ({
@@ -91,7 +118,7 @@ export const AnimatedButton = ({
 			lineHeight: 1,
 			letterSpacing: 0.05,
 			textAlign: "center" as const,
-			font: "src/fonts/Space_Mono/SpaceMono-Regular.ttf",
+			font: "fonts/Space_Mono/SpaceMono-Regular.ttf",
 		}),
 		[],
 	);
@@ -104,13 +131,6 @@ export const AnimatedButton = ({
 		[activeButton, buttonId, positions],
 	);
 
-	const buttonColor = useMemo(() => {
-		if (isHovered) return colorInstances.hover;
-		if (isActive) return colorInstances.active;
-		if (!activeButton) return colorInstances.default;
-		return colorInstances.inactive;
-	}, [isHovered, isActive, activeButton]);
-
 	const handleHoverStart = useCallback(() => {
 		setIsHovered(true);
 		onHover?.(true);
@@ -120,6 +140,14 @@ export const AnimatedButton = ({
 		setIsHovered(false);
 		onHover?.(false);
 	}, [onHover]);
+
+	const handleClick = useCallback(
+		(event: ThreeEvent<MouseEvent>) => {
+			event.stopPropagation();
+			onClick?.();
+		},
+		[onClick],
+	);
 
 	const animatePosition = useMemo(
 		() => ({
@@ -153,19 +181,16 @@ export const AnimatedButton = ({
 			dispose={null}
 			onHoverStart={handleHoverStart}
 			onHoverEnd={handleHoverEnd}
-			onClick={onClick}
+			onClick={handleClick}
 		>
-			<motion.mesh
+			<mesh
+				ref={meshRef}
 				name={geometryName}
 				castShadow
 				receiveShadow
 				geometry={nodes[geometryName].geometry}
 				material={material}
 				rotation={[Math.PI / 2, 0, 0]}
-				animate={{
-					color: buttonColor,
-				}}
-				transition={transition}
 			/>
 
 			<motion.group animate={textPosition} transition={transition}>
@@ -174,3 +199,5 @@ export const AnimatedButton = ({
 		</motion.group>
 	);
 };
+
+AnimatedButton.displayName = "AnimatedButton";

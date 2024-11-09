@@ -55,6 +55,28 @@ interface GlitchTextProps {
 
 type ActiveText = TextConfig & { readonly id: number };
 
+type ColorEffect = {
+	baseColor: string;
+	glowEffect: string;
+};
+
+type DepthColorMap = Record<Depth, ColorEffect>;
+
+const DEPTH_COLORS: DepthColorMap = {
+	near: {
+		baseColor: COLORS.text.primary,
+		glowEffect: "0 0 30px rgba(59, 130, 246, 0.4)" as const,
+	},
+	mid: {
+		baseColor: "rgba(165, 243, 252, 0.8)" as const,
+		glowEffect: "0 0 20px rgba(59, 130, 246, 0.3)" as const,
+	},
+	far: {
+		baseColor: "rgba(165, 243, 252, 0.6)" as const,
+		glowEffect: COLORS.glow.weak,
+	},
+} as const;
+
 // Default Configurations
 const DEFAULT_VISUAL_CONFIG: Required<VisualConfig> = {
 	baseColor: COLORS.text.primary,
@@ -251,23 +273,7 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 			<AnimatePresence mode="popLayout">
 				{activeTexts.map(({ id, text, depth, position }) => {
 					const depthStyle = depthStyles[depth];
-					let baseColor = COLORS.text.primary;
-					let glowEffect = COLORS.glow.weak;
-
-					switch (depth) {
-						case "near":
-							baseColor = COLORS.text.primary;
-							glowEffect = COLORS.glow.strong;
-							break;
-						case "mid":
-							baseColor = COLORS.text.secondary;
-							glowEffect = COLORS.glow.medium;
-							break;
-						case "far":
-							baseColor = COLORS.text.muted;
-							glowEffect = COLORS.glow.weak;
-							break;
-					}
+					const colorEffect = DEPTH_COLORS[depth];
 
 					return (
 						<GlitchText
@@ -280,12 +286,12 @@ export const GlitchyTextPool: React.FC<TextPoolProps> = ({
 							style={{
 								position: "absolute",
 								fontFamily: "monospace",
-								color: baseColor,
+								color: colorEffect.baseColor,
 								opacity: depthStyle.opacity,
 								transform: `scale(${depthStyle.scale})`,
 								zIndex: depthStyle.zIndex,
 								fontSize: depthStyle.fontSize,
-								textShadow: glowEffect,
+								textShadow: colorEffect.glowEffect,
 								background: `linear-gradient(135deg,
                                     ${COLORS.effects.glitch.overlay},
                                     transparent)`,

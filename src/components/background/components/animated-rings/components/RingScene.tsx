@@ -1,14 +1,12 @@
 import { Environment } from "@react-three/drei";
-import { Suspense, memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import * as THREE from "three";
 import { COLORS } from "../../../../../global-utils/colors.ts";
 import { Cube } from "../../../../3d-models/Cube";
-import { Hourglass } from "../../../../3d-models/Hourglass";
 import { Icosphere } from "../../../../3d-models/Icosphere";
 import { Sphere } from "../../../../3d-models/Sphere";
 import { Spiral } from "../../../../3d-models/Spiral";
 import { Tetrahedron } from "../../../../3d-models/Tetrahedron";
-import { Halottolo } from "../../../../3d-models/halottolo";
 
 const commonMaterialOptions = {
 	emissive: COLORS.palette.purple.primary,
@@ -73,17 +71,16 @@ export const RingScene = memo(() => {
 				color={COLORS.palette.cyan.primary}
 			/>
 
-			<Suspense fallback={null}>
-				<Halottolo
-					rotationOptions={{ speed: 0.1 }}
-					rotation={[1.9, 1.25, -0.5]}
-					position={[-3.5, 1, 5]}
-					materialOptions={{
-						...glowMaterial,
-						emissiveIntensity: 1,
-					}}
-				/>
-			</Suspense>
+			{/*<Suspense fallback={null}>*/}
+			{/*	<Halottolo*/}
+			{/*		rotationOptions={{ speed: 0.1 }}*/}
+			{/*		rotation={[1.9, 1.25, -0.5]}*/}
+			{/*		position={[-3.5, 1, 5]}*/}
+			{/*		materialOptions={{*/}
+			{/*			...glowMaterial,*/}
+			{/*		}}*/}
+			{/*	/>*/}
+			{/*</Suspense>*/}
 
 			<Spiral
 				position={[-5, -15, 4.7]}
@@ -169,19 +166,19 @@ export const RingScene = memo(() => {
 				/>
 			</instancedMesh>
 
-			<Hourglass
-				position={[-30, -10, -15]}
-				rotation={[9, 2, 0]}
-				scale={30}
-				instances={[
-					{ position: [-30, -10, -15], rotation: [9, 2, 0], scale: 30 },
-					{ position: [-25, -8, -12], rotation: [8, 1.5, 0.5], scale: 25 },
-				]}
-				materialOptions={{
-					...wireframeMaterial,
-					emissiveIntensity: 0.8,
-				}}
-			/>
+			{/*<Hourglass*/}
+			{/*	position={[-30, -10, -15]}*/}
+			{/*	rotation={[9, 2, 0]}*/}
+			{/*	scale={30}*/}
+			{/*	instances={[*/}
+			{/*		{ position: [-30, -10, -15], rotation: [9, 2, 0], scale: 30 },*/}
+			{/*		{ position: [-25, -8, -12], rotation: [8, 1.5, 0.5], scale: 25 },*/}
+			{/*	]}*/}
+			{/*	materialOptions={{*/}
+			{/*		...wireframeMaterial,*/}
+			{/*		emissiveIntensity: 0.8,*/}
+			{/*	}}*/}
+			{/*/>*/}
 
 			<instancedMesh count={2} geometry={cubeGeometry}>
 				<Cube

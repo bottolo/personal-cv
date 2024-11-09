@@ -45,7 +45,7 @@ export function Hourglass({
 	rotationOptions = defaultRotationOptions,
 	geometryOptions = defaultHourglassOptions,
 	scale = 1,
-	path = "/hourglass.glb",
+	path = `${import.meta.env.BASE_URL}hourglass.glb`,
 	instances,
 	instanceRotation = true,
 	...props
@@ -65,17 +65,16 @@ export function Hourglass({
 		const geometry = nodes.Cone.geometry.clone();
 
 		if (geometryOptions.detail !== defaultHourglassOptions.detail) {
-			// Apply detail modifications
+			// Apply detail modifications if necessary
 		}
 
 		if (geometryOptions.segments !== defaultHourglassOptions.segments) {
-			// Apply segment modifications
+			// Apply segment modifications if necessary
 		}
 
 		return geometry;
 	}, [nodes.Cone.geometry, geometryOptions]);
 
-	// Initialize instances
 	useMemo(() => {
 		if (instances) {
 			instancesRef.current = instances.map(() => new THREE.Object3D());
@@ -97,7 +96,7 @@ export function Hourglass({
 		}
 	}, [instances, scale]);
 
-	useFrame((state, delta) => {
+	useFrame((_state, delta) => {
 		if (instances && instanceRotation && rotationOptions.axis !== "none") {
 			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
 			instancesRef.current.forEach((instance, i) => {
@@ -141,6 +140,8 @@ export function Hourglass({
 	);
 }
 
-export function preloadHourglass(path = "/hourglass.glb") {
+export function preloadHourglass(
+	path = `${import.meta.env.BASE_URL}hourglass.glb`,
+) {
 	useGLTF.preload(path);
 }

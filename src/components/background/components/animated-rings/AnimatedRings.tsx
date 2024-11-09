@@ -7,14 +7,23 @@ import {
 	Scanline,
 } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize, Resolution } from "postprocessing";
-import { Suspense, memo, useCallback, useEffect, useMemo, useRef } from "react";
+import {
+	Suspense,
+	memo,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { Vector2 } from "three";
 import { cn } from "../../../../global-utils/cn.ts";
 import { COLORS } from "../../../../global-utils/colors.ts";
 import { useDialogueStore } from "../../../../store/dialogue-store.ts";
 import { CameraController } from "./components/CameraController.tsx";
 import { RingScene } from "./components/RingScene.tsx";
 
-// Static configurations
+// Configurations with proper types
 const CAMERA_CONFIG = {
 	position: [-5, 2, 30] as const,
 	fov: 100,
@@ -42,7 +51,7 @@ const CANVAS_CONFIG = {
 
 const BLOOM_CONFIG = {
 	intensity: 15,
-	kernelSize: KernelSize.LARGE, // Reduced from VERY_LARGE
+	kernelSize: KernelSize.LARGE,
 	luminanceThreshold: 0.9,
 	luminanceSmoothing: 0.05,
 	mipmapBlur: true,
@@ -50,47 +59,36 @@ const BLOOM_CONFIG = {
 	resolutionY: Resolution.AUTO_SIZE,
 } as const;
 
-const GLITCH_BASE_CONFIG = {
-	delay: [1.5, 3.5] as [number, number],
-	duration: [0.1, 0.2] as [number, number],
-	active: true,
-} as const;
-
-// Base effect configurations
-const BASE_EFFECT_CONFIGS = {
-	normal: {
-		chromaticAberration: { offset: [0.002, 0.002] },
-		scanline: {
-			blendFunction: BlendFunction.OVERLAY,
-			density: 1.75,
-		},
-		glitch: {
-			...GLITCH_BASE_CONFIG,
-			strength: [0.01, 0.1],
-			ratio: 1,
-		},
+// Effect configurations with proper vector types
+const createEffectConfigs = (isActive: boolean) => ({
+	chromaticAberration: {
+		offset: new Vector2(isActive ? 0.01 : 0.002, isActive ? 0.01 : 0.002),
+		radialModulation: false,
+		modulationOffset: 0,
 	},
-	active: {
-		chromaticAberration: { offset: [0.01, 0.01] },
-		scanline: {
-			blendFunction: BlendFunction.OVERLAY,
-			density: 4,
-		},
-		glitch: {
-			...GLITCH_BASE_CONFIG,
-			strength: [0.2, 0.5],
-			ratio: 0.85,
-		},
+	scanline: {
+		blendFunction: BlendFunction.OVERLAY,
+		density: isActive ? 4 : 1.75,
 	},
-} as const;
+	glitch: {
+		delay: new Vector2(1.5, 3.5),
+		duration: new Vector2(0.1, 0.2),
+		strength: new Vector2(isActive ? 0.2 : 0.01, isActive ? 0.5 : 0.1),
+		ratio: isActive ? 0.85 : 1,
+		active: true,
+	},
+});
 
+// Memoized components
 const MemoizedRingScene = memo(RingScene);
 const MemoizedCameraController = memo(CameraController);
 
+// Effects component with proper types
 const Effects = memo(({ isGlitchActive }: { isGlitchActive: boolean }) => {
-	const configs = isGlitchActive
-		? BASE_EFFECT_CONFIGS.active
-		: BASE_EFFECT_CONFIGS.normal;
+	const configs = useMemo(
+		() => createEffectConfigs(isGlitchActive),
+		[isGlitchActive],
+	);
 
 	return (
 		<EffectComposer multisampling={0} enabled={true}>
@@ -122,7 +120,7 @@ interface AnimatedRingsProps {
 const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
 	const glitchTimeoutRef = useRef<number>();
 	const { currentDialogue } = useDialogueStore();
-	const isGlitchActiveRef = useRef(false);
+	const [isGlitchActive, setIsGlitchActive] = useState(false);
 
 	const containerClassName = useMemo(
 		() => cn(className, "fixed inset-0 overflow-hidden blur-[0.1rem]"),
@@ -130,11 +128,11 @@ const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
 	);
 
 	const handleGlitchEffect = useCallback(() => {
-		isGlitchActiveRef.current = true;
+		setIsGlitchActive(true);
 		window.clearTimeout(glitchTimeoutRef.current);
 
 		glitchTimeoutRef.current = window.setTimeout(() => {
-			isGlitchActiveRef.current = false;
+			setIsGlitchActive(false);
 		}, 200);
 	}, []);
 
@@ -147,7 +145,7 @@ const AnimatedRings = memo(({ className }: AnimatedRingsProps) => {
 		<div className={containerClassName}>
 			<Canvas camera={CAMERA_CONFIG} {...CANVAS_CONFIG}>
 				<Scene />
-				<Effects isGlitchActive={isGlitchActiveRef.current} />
+				<Effects isGlitchActive={isGlitchActive} />
 			</Canvas>
 		</div>
 	);

@@ -42,7 +42,7 @@ export function Icosphere({
 	rotationOptions = defaultRotationOptions,
 	geometryOptions = defaultIcosphereOptions,
 	scale = 1,
-	path = "/icosph.glb",
+	path = `${import.meta.env.BASE_URL}icosph.glb`,
 	...props
 }: IcosphereProps) {
 	// Refs
@@ -79,7 +79,7 @@ export function Icosphere({
 	}, [nodes.Icosphere.geometry, geometryOptions]);
 
 	// Handle rotation animation
-	useFrame((state, delta) => {
+	useFrame((_state, delta) => {
 		if (groupRef.current && rotationOptions.axis !== "none") {
 			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
 			groupRef.current.rotation[rotationOptions.axis ?? "y"] += delta * speed;
@@ -131,10 +131,4 @@ export function Icosphere({
 	);
 }
 
-// Preload utility
-export function preloadIcosphere(path = "/icosph.glb") {
-	useGLTF.preload(path);
-}
-
-// Re-export type for external use
 export type { IcosphereProps, IcosphereOptions };

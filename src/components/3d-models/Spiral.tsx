@@ -5,7 +5,10 @@ import * as THREE from "three";
 import { createMaterial } from "./utils/create-material";
 import type { GeometricProps } from "./utils/geometry-props";
 import { defaultMaterialOptions } from "./utils/material-options";
-import { defaultRotationOptions } from "./utils/rotation-options";
+import {
+	type RotationOptions,
+	defaultRotationOptions,
+} from "./utils/rotation-options";
 
 interface SpiralGLTF extends THREE.Object3D {
 	nodes: {
@@ -43,12 +46,19 @@ const defaultSpiralOptions: SpiralOptions = {
 	height: 2,
 };
 
+// Type guard for rotation axis
+const isValidRotationAxis = (
+	axis: string,
+): axis is Exclude<RotationOptions, "none"> => {
+	return ["x", "y", "z"].includes(axis);
+};
+
 export function Spiral({
 	materialOptions = defaultMaterialOptions,
 	rotationOptions = defaultRotationOptions,
 	geometryOptions = defaultSpiralOptions,
 	scale = 1,
-	path = "/spiral.glb",
+	path = `${import.meta.env.BASE_URL}spiral.glb`,
 	instances,
 	instanceRotation = true,
 	...props
@@ -59,7 +69,6 @@ export function Spiral({
 
 	const { nodes } = useGLTF(path) as unknown as SpiralGLTF;
 
-	// Create custom material
 	const material = useMemo(
 		() => createMaterial(materialOptions),
 		[materialOptions],
@@ -67,20 +76,7 @@ export function Spiral({
 
 	// Memoize geometry modifications
 	const modifiedGeometry = useMemo(() => {
-		const geometry = nodes.Spiral.geometry.clone();
-
-		// Apply any geometry modifications based on geometryOptions
-		if (
-			geometryOptions.segments !== defaultSpiralOptions.segments ||
-			geometryOptions.turns !== defaultSpiralOptions.turns ||
-			geometryOptions.radius !== defaultSpiralOptions.radius ||
-			geometryOptions.height !== defaultSpiralOptions.height
-		) {
-			// Apply modifications if needed
-			// This would depend on how you want to modify the spiral geometry
-		}
-
-		return geometry;
+		return nodes.Spiral.geometry.clone();
 	}, [nodes.Spiral.geometry, geometryOptions]);
 
 	// Initialize instances
@@ -108,26 +104,32 @@ export function Spiral({
 		}
 	}, [instances, scale]);
 
-	// Handle rotation animation
-	useFrame((state, delta) => {
-		if (instances && instanceRotation && rotationOptions.axis !== "none") {
-			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
+	useFrame((_state, delta) => {
+		const axis = rotationOptions.axis ?? "y";
+		const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
+
+		if (instances && instanceRotation && axis !== "none") {
 			instancesRef.current.forEach((instance, i) => {
-				instance.rotation[rotationOptions.axis ?? "y"] += delta * speed;
-				instance.updateMatrix();
-				instancedMeshRef.current?.setMatrixAt(i, instance.matrix);
+				if (isValidRotationAxis(axis)) {
+					instance.rotation[axis] += delta * speed;
+					instance.updateMatrix();
+					instancedMeshRef.current?.setMatrixAt(i, instance.matrix);
+				}
 			});
 			if (instancedMeshRef.current) {
 				instancedMeshRef.current.instanceMatrix.needsUpdate = true;
 			}
-		} else if (groupRef.current && rotationOptions.axis !== "none") {
-			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
-			groupRef.current.rotation[rotationOptions.axis ?? "y"] += delta * speed;
+		} else if (
+			groupRef.current &&
+			axis !== "none" &&
+			isValidRotationAxis(axis)
+		) {
+			groupRef.current.rotation[axis] += delta * speed;
 		}
 	});
 
 	// Render instanced or single mesh
-	if (instances) {
+	if (instances?.length) {
 		return (
 			<instancedMesh
 				ref={instancedMeshRef}
@@ -154,8 +156,8 @@ export function Spiral({
 	);
 }
 
-// Preload utility
-export function preloadSpiral(path = "/spiral.glb") {
+// Preload utility with dynamic path
+export function preloadSpiral(path = `${import.meta.env.BASE_URL}spiral.glb`) {
 	useGLTF.preload(path);
 }
 
