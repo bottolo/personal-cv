@@ -1,6 +1,7 @@
 import { Environment } from "@react-three/drei";
 import { type ReactNode, Suspense, memo } from "react";
 import { COLORS } from "../../../../global-utils/colors.ts";
+import { Sphere } from "../../../3d-models/Sphere.tsx";
 import { Halottolo } from "../../../3d-models/halottolo.tsx";
 
 interface BaseSceneProps {
@@ -48,6 +49,18 @@ export const BaseScene = memo(
 							roughness: 0.64,
 						}}
 						scale={3}
+					/>
+					<Sphere
+						position={[10, 0, 0]}
+						rotation={[0, 0, 0.5]}
+						materialOptions={{
+							color: COLORS.palette.cyan.primary,
+							emissive: COLORS.palette.blue.primary,
+							emissiveIntensity: 0.8,
+							opacity: 0.4,
+							transparent: true,
+						}}
+						scale={850}
 					/>
 					{children}
 				</Suspense>

@@ -77,7 +77,7 @@ export const ProjectCard = memo(
 						}}
 					>
 						<img
-							src={selectedImage.src}
+							src={`${import.meta.env.BASE_URL}${selectedImage.src}`}
 							alt={selectedImage.alt}
 							className="w-full h-full object-cover"
 						/>

@@ -34,7 +34,7 @@ export const ProjectImage = memo(
 				transition={hologramAnimations.glow.transition}
 			>
 				<img
-					src={image.src}
+					src={`${import.meta.env.BASE_URL}${image.src}`}
 					alt={image.alt}
 					className="w-full h-full object-cover"
 					style={{

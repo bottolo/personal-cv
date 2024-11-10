@@ -1,7 +1,7 @@
 import { useGLTF } from "@react-three/drei";
 import type { GroupProps } from "@react-three/fiber";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
 
@@ -42,12 +42,54 @@ const defaultMaterialOptions: MaterialOptions = {
 	color: "#8c75e1",
 	metalness: 1,
 	roughness: 0.3,
-};
+} as const;
 
 const defaultRotationOptions: RotationOptions = {
 	axis: "x",
 	speed: 0.1,
-};
+} as const;
+
+// Pre-calculate static rotations
+const ROTATIONS = {
+	default: [0, 0, 0],
+	torus001: [-Math.PI / 2, 0, 0],
+	torus002: [Math.PI / 2, 0, 0],
+	torus003: [Math.PI, 0, 0],
+	torus004: [Math.PI / 4, 0, 0],
+	torus005: [-Math.PI / 4, 0, 0],
+	torus006: [2.35619432, 0, 0],
+	torus007: [-2.3561946, 0, 0],
+} as const;
+
+// Create a reusable mesh component to reduce code duplication
+const TorusMesh = memo(
+	({
+		name,
+		geometry,
+		material,
+		rotation = ROTATIONS.default,
+		scale,
+	}: {
+		name: string;
+		geometry: THREE.BufferGeometry;
+		material: THREE.Material;
+		rotation?: readonly [number, number, number];
+		scale: number;
+	}) => (
+		<mesh
+			name={name}
+			castShadow
+			receiveShadow
+			geometry={geometry}
+			material={material}
+			rotation={rotation}
+			scale={scale}
+			userData={{ name }}
+		/>
+	),
+);
+
+TorusMesh.displayName = "TorusMesh";
 
 export function Halottolo({
 	materialOptions = defaultMaterialOptions,
@@ -59,6 +101,7 @@ export function Halottolo({
 	const { nodes } = useGLTF(path) as GLTFResult;
 	const groupRef = useRef<THREE.Group>(null);
 
+	// Memoize material creation
 	const material = useMemo(() => {
 		const mergedMaterialOptions = {
 			...defaultMaterialOptions,
@@ -70,24 +113,46 @@ export function Halottolo({
 			roughness: mergedMaterialOptions.roughness,
 			side: THREE.DoubleSide,
 		});
-	}, [materialOptions]);
+	}, [
+		materialOptions.color,
+		materialOptions.metalness,
+		materialOptions.roughness,
+	]);
 
+	// Optimize rotation calculation with useRef
+	const rotationRef = useRef({
+		axis: rotationOptions.axis ?? defaultRotationOptions.axis,
+		speed: rotationOptions.speed ?? defaultRotationOptions.speed,
+	});
+
+	// Update rotation ref when props change
+	useEffect(() => {
+		rotationRef.current = {
+			axis: rotationOptions.axis ?? defaultRotationOptions.axis,
+			speed: rotationOptions.speed ?? defaultRotationOptions.speed,
+		};
+	}, [rotationOptions.axis, rotationOptions.speed]);
+
+	// Optimize frame updates
 	useFrame((state, delta) => {
-		if (groupRef.current && rotationOptions.axis !== "none") {
-			const speed = rotationOptions.speed ?? defaultRotationOptions.speed;
-			groupRef.current.rotation[rotationOptions.axis ?? "x"] += delta * speed;
+		if (groupRef.current && rotationRef.current.axis !== "none") {
+			groupRef.current.rotation[rotationRef.current.axis] +=
+				delta * rotationRef.current.speed;
 		}
 	});
 
-	const baseScale = 8 * scale;
-	const cylinderScale: [number, number, number] = [
-		baseScale,
-		baseScale * 0.625,
-		baseScale,
-	];
+	// Memoize scale calculations
+	const scales = useMemo(
+		() => ({
+			base: scale,
+			cylinder: [8 * scale, 8 * scale * 0.625, 8 * scale] as const,
+		}),
+		[scale],
+	);
 
-	return (
-		<group {...props}>
+	// Memoize the entire mesh structure
+	const meshes = useMemo(
+		() => (
 			<group ref={groupRef} name="Scene">
 				<mesh
 					name="Cylinder"
@@ -95,91 +160,71 @@ export function Halottolo({
 					receiveShadow
 					geometry={nodes.Cylinder.geometry}
 					material={material}
-					scale={cylinderScale}
+					scale={scales.cylinder}
 					userData={{ name: "Cylinder" }}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus.geometry}
 					material={material}
-					scale={scale}
-					userData={{ name: "Torus" }}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus001"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus001.geometry}
 					material={material}
-					rotation={[-Math.PI / 2, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.001" }}
+					rotation={ROTATIONS.torus001}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus002"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus002.geometry}
 					material={material}
-					rotation={[Math.PI / 2, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.002" }}
+					rotation={ROTATIONS.torus002}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus003"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus003.geometry}
 					material={material}
-					rotation={[Math.PI, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.003" }}
+					rotation={ROTATIONS.torus003}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus004"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus004.geometry}
 					material={material}
-					rotation={[Math.PI / 4, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.004" }}
+					rotation={ROTATIONS.torus004}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus005"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus005.geometry}
 					material={material}
-					rotation={[-Math.PI / 4, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.005" }}
+					rotation={ROTATIONS.torus005}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus006"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus006.geometry}
 					material={material}
-					rotation={[2.35619432, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.006" }}
+					rotation={ROTATIONS.torus006}
+					scale={scales.base}
 				/>
-				<mesh
+				<TorusMesh
 					name="Torus007"
-					castShadow
-					receiveShadow
 					geometry={nodes.Torus007.geometry}
 					material={material}
-					rotation={[-2.3561946, 0, 0]}
-					scale={scale}
-					userData={{ name: "Torus.007" }}
+					rotation={ROTATIONS.torus007}
+					scale={scales.base}
 				/>
 			</group>
-		</group>
+		),
+		[nodes, material, scales],
 	);
+
+	return <group {...props}>{meshes}</group>;
 }
 
+// Preload the model
 useGLTF.preload(`${import.meta.env.BASE_URL}halottolo.glb`);

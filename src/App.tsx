@@ -1,34 +1,32 @@
 import { useState } from "react";
-import { DynamicBackground } from "./components/background/Background";
-import { Choices } from "./components/choices/Choices";
-import Cursor from "./components/cursor/Cursor";
-import Content from "./components/projects/Content";
-import { MonitorBorder } from "./components/tilt-container/MonitorBorder";
-import TiltContainer from "./components/tilt-container/TiltContainer";
-import type { Dialogue } from "./global-utils/dialogue-types.ts";
-import { useDialogueStore } from "./store/dialogue-store";
-
-const MainContent = ({ currentDialogue }: { currentDialogue: Dialogue }) => (
-	<>
-		<DynamicBackground />
-		<Choices />
-		{currentDialogue && <Content />}
-	</>
-);
+import Cursor from "./components/cursor/Cursor.tsx";
+import BootSequence from "./components/menu/BootSequence.tsx";
+import BorderLayout from "./components/menu/BorderLayout.tsx";
+import { DynamicContent } from "./components/menu/DynamicContent.tsx";
+import TiltContainer from "./components/tilt-container/TiltContainer.tsx";
+import { useMenuStore } from "./store/menu-store.ts";
 
 function App() {
-	const { currentDialogue } = useDialogueStore();
+	const { isMainContentVisible } = useMenuStore();
 	const [isMonitorOn, setIsMonitorOn] = useState(false);
+
+	const handleBootComplete = () => {
+		setIsMonitorOn(true);
+	};
 
 	return (
 		<>
-			<TiltContainer>
-				{isMonitorOn && <MainContent currentDialogue={currentDialogue} />}
-			</TiltContainer>
+			{!isMonitorOn && <BootSequence onBootComplete={handleBootComplete} />}
+			{isMonitorOn && (
+				<BorderLayout>
+					{" "}
+					<TiltContainer>
+						{isMainContentVisible ? <DynamicContent /> : <div>ciao</div>}
+					</TiltContainer>
+				</BorderLayout>
+			)}
 			<Cursor />
-			<MonitorBorder onPowerChange={setIsMonitorOn} />
 		</>
 	);
 }
-
 export default App;
