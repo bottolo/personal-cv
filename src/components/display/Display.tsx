@@ -1,86 +1,136 @@
-import type React from "react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { cn } from "../../utils/cn.ts";
+import { mapRange } from "../../utils/map-range.ts";
 import {
-	type CRTAnimationType,
-	CRTAnimationTypes,
-	type CRTColorType,
-	CRTColorTypes,
-	crtAnimationClasses,
-	crtBaseClasses,
-	crtColorClasses,
-} from "./crt-utils";
+	type BaseConfig,
+	CRTColors,
+	type GlowConfig,
+	type ScanlineConfig,
+	type ScanlinesConfig,
+} from "./types.ts";
 
 interface DisplayProps {
-	children: React.ReactNode;
+	children: ReactNode;
 	className?: string;
-	colorScheme?: CRTColorType;
-	animationType?: CRTAnimationType;
+	scanline?: boolean;
+	scanlines?: boolean;
+	flicker?: boolean;
+	glow?: boolean;
+	scanlineConfig?: ScanlineConfig;
+	scanlinesConfig?: ScanlinesConfig;
+	flickerConfig?: BaseConfig;
+	glowConfig?: GlowConfig;
 }
 
-const Display = ({
+export const Display = ({
 	children,
 	className,
-	colorScheme = CRTColorTypes.BACKGROUND,
-	animationType = CRTAnimationTypes.SCANLINE,
+	scanline = false,
+	scanlines = false,
+	flicker = false,
+	glow = false,
+	scanlineConfig = {},
+	scanlinesConfig = {},
+	flickerConfig = {},
+	glowConfig = {},
 }: DisplayProps) => {
 	const [scanPos, setScanPos] = useState(0);
 
+	const scanlineHeight = mapRange(scanlineConfig?.height, 0, 100, 0, 2);
+	const scanlineOpacity = mapRange(scanlineConfig?.opacity);
+	const scanlineSpeed = mapRange(scanlineConfig?.speed, 0, 100, 0, 200);
+
+	const scanlinesSpacing = mapRange(scanlinesConfig?.count, 0, 100, 0, 20);
+	const scanlinesOpacity = mapRange(scanlinesConfig?.opacity);
+	const scanlinesBlur = mapRange(scanlinesConfig?.blur, 0, 100, 0, 2);
+
+	const flickerIntensity = mapRange(flickerConfig?.intensity, 0, 100, 0.9, 1);
+
+	const glowBrightness = mapRange(glowConfig?.spread, 0, 100, 1, 1.5);
+	const glowBlur = mapRange(glowConfig?.blur ?? 50, 0, 100, 0, 10);
+	const glowColor = CRTColors[glowConfig.color ?? "GLOW"];
+
 	useEffect(() => {
+		if (!scanline) return;
 		const interval = setInterval(() => {
 			setScanPos((prev) => (prev + 1) % 100);
-		}, 1000 / 120);
-
+		}, scanlineSpeed);
 		return () => clearInterval(interval);
-	}, []);
+	}, [scanline, scanlineSpeed]);
 
 	return (
-		<div
-			className={cn(
-				crtBaseClasses.wrapper,
-				crtColorClasses[colorScheme],
-				crtColorClasses.text,
-				className,
-			)}
-		>
-			{/* Main content */}
-			{children}
+		<div className={cn("fixed inset-0 overflow-hidden", className)}>
+			<div className="relative w-full h-full">
+				<div className="h-screen overflow-auto">
+					{glow ? (
+						<div
+							className="animate-colorShift"
+							style={{
+								filter: `brightness(${glowBrightness}) blur(${glowBlur}px)`,
+								backgroundColor: `color-mix(in srgb, ${glowColor} 10%, transparent)`,
+							}}
+						>
+							{children}
+						</div>
+					) : (
+						<div className="animate-colorShift">{children}</div>
+					)}
+				</div>
+				<div className="h-screen overflow-auto">
+					{glow ? (
+						<div
+							className="animate-colorShift"
+							style={{
+								filter: `brightness(${glowBrightness}) blur(${glowBlur}px)`,
+								backgroundColor: `color-mix(in srgb, ${glowColor} 10%, transparent)`,
+							}}
+						>
+							{children}
+						</div>
+					) : (
+						<div className="animate-colorShift">{children}</div>
+					)}
+				</div>
 
-			{/* Moving scanline */}
-			<div
-				className={cn(
-					crtBaseClasses.scanlineBase,
-					crtBaseClasses.movingScanline,
-					crtColorClasses.movingScanline,
-					"z-50",
+				{scanline && (
+					<div
+						className="absolute w-full pointer-events-none z-50"
+						style={{
+							height: `${scanlineHeight}px`,
+							top: `${scanPos}%`,
+							backgroundColor: `rgba(0, 0, 0, ${scanlineOpacity})`,
+							transition: `top ${scanlineSpeed}ms linear`,
+						}}
+					/>
 				)}
-				style={{
-					top: `${scanPos}%`,
-					transition: "top 16.67ms linear",
-				}}
-			/>
 
-			{/* Static scanlines */}
-			<div
-				className={cn(crtBaseClasses.scanlineBase, "inset-0 z-40")}
-				style={{
-					backgroundImage:
-						"linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 51%)",
-					backgroundSize: "100% 4px",
-				}}
-			/>
-
-			{/* CRT flicker effect */}
-			<div
-				className={cn(
-					crtBaseClasses.scanlineBase,
-					"inset-0 z-30",
-					crtColorClasses.flicker,
-					crtAnimationClasses[animationType],
+				{scanlines && (
+					<div
+						className="absolute inset-0 pointer-events-none z-40"
+						style={{
+							backgroundImage: `linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, ${scanlinesOpacity}) 51%)`,
+							backgroundSize: `100% ${scanlinesSpacing}px`,
+							filter: `blur(${scanlinesBlur}px)`,
+						}}
+					/>
 				)}
-			/>
+
+				{flicker && (
+					<div
+						className="absolute inset-0 pointer-events-none z-30 bg-[rgba(18,16,16,0.1)] animate-flicker"
+						style={{
+							opacity: flickerIntensity,
+						}}
+					/>
+				)}
+
+				<div
+					className="absolute inset-0 pointer-events-none z-20 bg-crt-overlay"
+					style={{
+						backgroundSize: "100% 2px, 3px 100%",
+					}}
+				/>
+			</div>
 		</div>
 	);
 };
-
-export default Display;
