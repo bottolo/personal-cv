@@ -3,6 +3,7 @@ export enum CRTColors {
 	TEXT = "#c8c8c8",
 	SCANLINE = "#000000",
 	GLOW = "#ffffff",
+	OUTER_GLOW = "#493b8a",
 }
 
 export interface BaseConfig {
@@ -25,4 +26,5 @@ export interface GlowConfig extends BaseConfig {
 	spread?: number;
 	color?: keyof typeof CRTColors;
 	blur?: number;
+	outerGlow?: number;
 }

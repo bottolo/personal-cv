@@ -16,6 +16,7 @@ interface DisplayProps {
 	scanlines?: boolean;
 	flicker?: boolean;
 	glow?: boolean;
+	borderGlow?: boolean;
 	scanlineConfig?: ScanlineConfig;
 	scanlinesConfig?: ScanlinesConfig;
 	flickerConfig?: BaseConfig;
@@ -29,6 +30,7 @@ export const Display = ({
 	scanlines = false,
 	flicker = false,
 	glow = false,
+	borderGlow = false,
 	scanlineConfig = {},
 	scanlinesConfig = {},
 	flickerConfig = {},
@@ -50,6 +52,25 @@ export const Display = ({
 	const glowBlur = mapRange(glowConfig?.blur ?? 50, 0, 100, 0, 10);
 	const glowColor = CRTColors[glowConfig.color ?? "GLOW"];
 
+	const baseIntensity = glowConfig?.color === "OUTER_GLOW" ? 2 : 1;
+	const outerGlow = mapRange(
+		glowConfig?.outerGlow ?? 50,
+		0,
+		100,
+		baseIntensity * 0.5,
+		baseIntensity * 2,
+	);
+
+	const borderGlowStyle = borderGlow
+		? {
+				boxShadow: `
+                inset 0 0 ${Math.round(outerGlow * 20)}px ${glowColor},
+                inset 0 0 ${Math.round(outerGlow * 40)}px ${glowColor},
+                inset 0 0 ${Math.round(outerGlow * 100)}px ${glowColor}
+            `,
+			}
+		: {};
+
 	useEffect(() => {
 		if (!scanline) return;
 		const interval = setInterval(() => {
@@ -59,7 +80,10 @@ export const Display = ({
 	}, [scanline, scanlineSpeed]);
 
 	return (
-		<div className={cn("fixed inset-0 overflow-hidden", className)}>
+		<div
+			className={cn("fixed inset-0 overflow-hidden", className)}
+			style={borderGlowStyle}
+		>
 			<div className="relative w-full h-full">
 				<div className="h-screen overflow-auto">
 					{glow ? (

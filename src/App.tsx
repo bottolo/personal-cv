@@ -10,6 +10,9 @@ function App() {
 		"prying fate",
 		"made for us",
 		"seen through",
+		"crossed",
+		"blessed",
+		"thought about",
 	];
 
 	const getRandomText = (count: number) => {
@@ -27,10 +30,16 @@ function App() {
 			scanlines
 			flicker
 			glow
+			borderGlow
 			scanlineConfig={{ intensity: 40, height: 70, opacity: 30, speed: 30 }}
 			scanlinesConfig={{ count: 40, opacity: 20, blur: 50 }}
 			flickerConfig={{ intensity: 100 }}
-			glowConfig={{ spread: 100, intensity: 100, blur: 4, color: "GLOW" }}
+			glowConfig={{
+				color: "OUTER_GLOW",
+				outerGlow: 75,
+				blur: 5,
+			}}
+			className={"scale-105"}
 		>
 			<div className="fixed h-screen w-screen inset-0 flex flex-col justify-center items-center bg-blue-700/30 overflow-hidden">
 				<div className="flex-1 overflow-hidden">
