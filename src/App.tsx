@@ -31,9 +31,9 @@ function App() {
 			flicker
 			glow
 			borderGlow
-			scanlineConfig={{ intensity: 40, height: 70, opacity: 30, speed: 30 }}
-			scanlinesConfig={{ count: 40, opacity: 20, blur: 50 }}
-			flickerConfig={{ intensity: 100 }}
+			scanlineConfig={{ intensity: 60, height: 70, opacity: 30, speed: 30 }}
+			scanlinesConfig={{ count: 30, opacity: 20, blur: 50 }}
+			flickerConfig={{ intensity: 1 }}
 			glowConfig={{
 				color: "OUTER_GLOW",
 				outerGlow: 75,

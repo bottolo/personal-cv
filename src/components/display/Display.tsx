@@ -46,7 +46,7 @@ export const Display = ({
 	const scanlinesOpacity = mapRange(scanlinesConfig?.opacity);
 	const scanlinesBlur = mapRange(scanlinesConfig?.blur, 0, 100, 0, 2);
 
-	const flickerIntensity = mapRange(flickerConfig?.intensity, 0, 100, 0.9, 1);
+	const flickerIntensity = mapRange(flickerConfig?.intensity, 0, 100, 0.1, 0.8);
 
 	const glowBrightness = mapRange(glowConfig?.spread, 0, 100, 1, 1.5);
 	const glowBlur = mapRange(glowConfig?.blur ?? 50, 0, 100, 0, 10);
@@ -100,21 +100,6 @@ export const Display = ({
 						<div className="animate-colorShift">{children}</div>
 					)}
 				</div>
-				<div className="h-screen overflow-auto">
-					{glow ? (
-						<div
-							className="animate-colorShift"
-							style={{
-								filter: `brightness(${glowBrightness}) blur(${glowBlur}px)`,
-								backgroundColor: `color-mix(in srgb, ${glowColor} 10%, transparent)`,
-							}}
-						>
-							{children}
-						</div>
-					) : (
-						<div className="animate-colorShift">{children}</div>
-					)}
-				</div>
 
 				{scanline && (
 					<div
@@ -141,9 +126,9 @@ export const Display = ({
 
 				{flicker && (
 					<div
-						className="absolute inset-0 pointer-events-none z-30 bg-[rgba(18,16,16,0.1)] animate-flicker"
+						className="absolute inset-0 pointer-events-none z-30 animate-flicker"
 						style={{
-							opacity: flickerIntensity,
+							backgroundColor: `rgba(18, 16, 16, ${flickerIntensity})`,
 						}}
 					/>
 				)}
