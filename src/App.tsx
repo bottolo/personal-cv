@@ -26,14 +26,15 @@ function App() {
 
 	return (
 		<Display
-			scanline
-			scanlines
+			movingScanline
+			verticalScanlines
+			horizontalScanlines
 			flicker
 			glow
 			borderGlow
 			scanlineConfig={{ intensity: 60, height: 70, opacity: 30, speed: 30 }}
 			scanlinesConfig={{ count: 30, opacity: 20, blur: 50 }}
-			flickerConfig={{ intensity: 1 }}
+			flickerConfig={{ intensity: 5 }}
 			glowConfig={{
 				color: "OUTER_GLOW",
 				outerGlow: 75,

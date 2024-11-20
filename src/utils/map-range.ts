@@ -1,5 +1,5 @@
 export const mapRange = (
-	value: number,
+	value: number | undefined,
 	min = 0,
 	max = 100,
 	targetMin = 0,
