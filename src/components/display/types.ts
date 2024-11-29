@@ -16,10 +16,15 @@ export interface ScanlineConfig extends BaseConfig {
 	opacity?: number;
 }
 
-export interface ScanlinesConfig extends BaseConfig {
+export interface DirectionalScanlinesConfig extends BaseConfig {
 	count?: number;
 	blur?: number;
 	opacity?: number;
+}
+
+export interface ScanlinesConfig {
+	horizontal?: DirectionalScanlinesConfig;
+	vertical?: DirectionalScanlinesConfig;
 }
 
 export interface GlowConfig extends BaseConfig {
@@ -27,4 +32,10 @@ export interface GlowConfig extends BaseConfig {
 	color?: keyof typeof CRTColors;
 	blur?: number;
 	outerGlow?: number;
+}
+
+export interface ChromaticAberrationConfig extends BaseConfig {
+	redIntensity?: number;
+	blueIntensity?: number;
+	offset?: number;
 }
