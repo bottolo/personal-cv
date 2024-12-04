@@ -1,3 +1,5 @@
+import axios from "axios";
+import { useEffect } from "react";
 import { Display } from "./components/display/Display.tsx";
 
 function App() {
@@ -24,24 +26,47 @@ function App() {
 
 	const screenText = getRandomText(1000);
 
+	useEffect(() => {
+		axios.get(`${import.meta.env.VITE_BACKEND_URL}`).then((response) => {
+			console.log(response.data.data.results);
+		});
+	}, []);
+
 	return (
 		<Display
 			movingScanline
 			verticalScanlines
-			horizontalScanlines
+			// horizontalScanlines
 			flicker
 			glow
 			borderGlow
 			scanlineConfig={{ intensity: 60, height: 70, opacity: 30, speed: 30 }}
-			scanlinesConfig={{ count: 30, opacity: 20, blur: 50 }}
+			scanlinesConfig={{
+				// horizontal: {
+				// 	count: 80,
+				// 	blur: 50,
+				// 	opacity: 5,
+				// },
+				vertical: {
+					count: 30,
+					blur: 50,
+					opacity: 20,
+				},
+			}}
 			flickerConfig={{ intensity: 5 }}
 			glowConfig={{
 				color: "OUTER_GLOW",
 				outerGlow: 75,
 				blur: 5,
 			}}
+			chromaticAberrationConfig={{
+				redIntensity: 10,
+				blueIntensity: 10,
+				offset: 30,
+			}}
 			className={"scale-105"}
 		>
+			{" "}
 			<div className="fixed h-screen w-screen inset-0 flex flex-col justify-center items-center bg-blue-700/30 overflow-hidden">
 				<div className="flex-1 overflow-hidden">
 					<div className="text-center text-[#96ceba] text-[1rem] font-mono tracking-normal leading-loose">
@@ -68,7 +93,7 @@ function App() {
 						allowFullScreen
 					/>
 				</div>
-			</div>
+			</div>{" "}
 		</Display>
 	);
 }

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Personal CV",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
